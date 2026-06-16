@@ -1056,7 +1056,7 @@
                             <div class="profile-card">
                                 <img class="profile-icon" src="https://file.garden/ai5LuPrOLRCONCXy/PROFILES/930727293c0bcbb9fcd9f95619d45ba1.jpg" alt="Caelum profile icon">
                                 <blockquote class="profile-copy">
-                                    <b>Name:</b> Caelum Nevada Vergara<br>
+                                    <b>Name:</b> Caelum Vergara<br>
                                     <b>Pronouns:</b> He/Him<br>
                                     <b>Location:</b> Manila, PH<br>
                                     Master’s student in Aerospace Engineering. Part-time worker @ a hobby shop. Born May 13. Hyuka FC. Strictly in-character. Minsan nagrereply sa DMs, minsan nde.
@@ -1134,25 +1134,6 @@
             </div>
             <div class="base-floor">
                 Copyright &copy; Caelum 2026-infinity. All operations online.
-            </div>
-        </div>
-
-        <!-- Draggable Relations Modal Layer -->
-        <div id="relations-popup" class="popup-window">
-            <div class="popup-header" id="relations-popup-header-drag">
-                <span>relations.exe</span>
-                <div class="popup-dots">
-                    <button class="popup-close" type="button" data-close-popup="relations-popup" aria-label="Close relations popup">×</button>
-                </div>
-            </div>
-            <div class="popup-body">
-                <div class="relation-detail">
-                    <img id="relation-popup-image" class="relation-icon" src="" alt="" hidden>
-                    <div class="relation-detail-copy">
-                        <span id="relation-popup-name" class="relation-title"></span>
-                        <p id="relation-popup-description"></p>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -1616,7 +1597,6 @@
             };
 
             let relationProfiles = [];
-            let activeRelationIndex = 0;
             let topPopupZ = 2000;
 
             function getSheetRows(data) {
@@ -1730,7 +1710,6 @@
 
             function renderRelationCarousel(entries) {
                 relationProfiles = entries;
-                activeRelationIndex = Math.min(activeRelationIndex, Math.max(0, relationProfiles.length - 1));
                 const carousel = document.getElementById("relations-carousel");
                 if (!carousel) return;
 
@@ -1776,31 +1755,6 @@
                 if (entries.length <= 1) {
                     track.style.animation = "none";
                 }
-
-                const popup = document.getElementById("relations-popup");
-                if (popup && popup.style.display === "block") {
-                    renderRelationPopup(activeRelationIndex);
-                }
-            }
-
-            function renderRelationPopup(index) {
-                const relation = relationProfiles[index];
-                if (!relation) return;
-                const image = document.getElementById("relation-popup-image");
-                const name = document.getElementById("relation-popup-name");
-                const description = document.getElementById("relation-popup-description");
-
-                if (relation.profile) {
-                    image.src = relation.profile;
-                    image.alt = relation.name || "relation profile";
-                    image.hidden = false;
-                } else {
-                    image.hidden = true;
-                    image.removeAttribute("src");
-                }
-
-                name.textContent = relation.name || "";
-                description.textContent = relation.description || "";
             }
 
             function normalizeArchiveImages(rows) {
@@ -1893,18 +1847,44 @@
             }
 
             function openRelationsPopup(index = 0) {
-                activeRelationIndex = Number.isFinite(Number(index)) ? Number(index) : 0;
-                renderRelationPopup(activeRelationIndex);
-                const popup = document.getElementById("relations-popup");
+                const i = Number.isFinite(Number(index)) ? Number(index) : 0;
+                const relation = relationProfiles[i];
+                if (!relation) return;
+
+                const popupId = "relations-popup-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
+                const popup = document.createElement("div");
+                popup.id = popupId;
+                popup.className = "popup-window";
+                popup.style.width = "330px";
+                popup.style.height = "260px";
+
+                const hasImage = !!relation.profile;
+                popup.innerHTML =
+                    '<div class="popup-header" id="' + popupId + '-header-drag">' +
+                        '<span>relations.exe</span>' +
+                        '<div class="popup-dots"><button class="popup-close" type="button" aria-label="Close relations popup">\xd7</button></div>' +
+                    '</div>' +
+                    '<div class="popup-body" style="overflow-x:hidden;">' +
+                        '<div class="relation-detail">' +
+                            (hasImage
+                                ? '<img class="relation-icon" src="' + relation.profile + '" alt="' + (relation.name || "relation profile") + '">'
+                                : '') +
+                            '<div class="relation-detail-copy">' +
+                                '<span class="relation-title">' + (relation.name || "") + '</span>' +
+                                '<p>' + (relation.description || "") + '</p>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+
+                popup.querySelector(".popup-close").addEventListener("click", () => popup.remove());
+
+                document.body.appendChild(popup);
                 popup.style.top = "50%";
                 popup.style.left = "50%";
                 popup.style.transform = "translate(-50%, -50%)";
                 popup.style.display = "block";
                 bringPopupToFront(popup);
-            }
-
-            function closeRelationsPopup() {
-                closePopupById("relations-popup");
+                dragElement(popup);
             }
 
             function openImageViewer(url) {
@@ -1934,7 +1914,6 @@
             }
 
             dragElement(document.getElementById("archive-popup"));
-            dragElement(document.getElementById("relations-popup"));
             dragElement(document.getElementById("image-viewer-popup"));
 
             function dragElement(elmnt) {
