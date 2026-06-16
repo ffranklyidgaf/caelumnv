@@ -1147,7 +1147,6 @@
             </div>
             <div class="popup-body">
                 <div class="relation-detail">
-                    <span id="relation-popup-blank" class="relation-icon blank-profile" hidden></span>
                     <img id="relation-popup-image" class="relation-icon" src="" alt="" hidden>
                     <div class="relation-detail-copy">
                         <span id="relation-popup-name" class="relation-title"></span>
@@ -1787,7 +1786,6 @@
             function renderRelationPopup(index) {
                 const relation = relationProfiles[index];
                 if (!relation) return;
-                const blank = document.getElementById("relation-popup-blank");
                 const image = document.getElementById("relation-popup-image");
                 const name = document.getElementById("relation-popup-name");
                 const description = document.getElementById("relation-popup-description");
@@ -1796,11 +1794,9 @@
                     image.src = relation.profile;
                     image.alt = relation.name || "relation profile";
                     image.hidden = false;
-                    blank.hidden = true;
                 } else {
                     image.hidden = true;
                     image.removeAttribute("src");
-                    blank.hidden = false;
                 }
 
                 name.textContent = relation.name || "";
