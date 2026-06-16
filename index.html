@@ -818,36 +818,35 @@
             }
 
             ./* Update this class */
+/* 1. Limit the size of the images inside the popup */
 .image-viewer-frame {
     display: block;
-    max-width: none;  /* Allows the image to be its natural width */
-    max-height: none; /* Allows the image to be its natural height */
-    object-fit: none; /* Prevents resizing/stretching */
+    max-width: 80vw;  /* Keeps image to 80% of screen width */
+    max-height: 70vh; /* Keeps image to 70% of screen height */
+    object-fit: contain; /* Ensures the whole image is visible */
     margin: 0 auto;
     border: 1px solid var(--border-color);
     background: var(--bg-main);
 }
 
-/* Update the popup window to stop resizing */
+/* 2. Lock the size of the popup window so it doesn't resize */
 .popup-window {
     display: none;
     position: fixed;
     z-index: 2000;
-    width: auto;      /* Change from fixed width to auto */
-    min-width: 240px;
-    min-height: 140px;
+    width: auto;      /* Window will adjust to fit the image */
     background: var(--bg-box);
     border: 1px solid var(--border-color);
     box-shadow: 0 10px 40px rgba(0,0,0,0.8);
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    /* REMOVE OR COMMENT OUT THESE TWO LINES */
-    /* resize: both; */
-    /* overflow: hidden; */
+    /* This stops the user from changing the size manually */
+    resize: none; 
+    overflow: hidden;
 }
 
-/* You can also hide the resize handle icon */
+/* 3. Hide the resize handle icon */
 .popup-window::after {
     display: none; 
 }
