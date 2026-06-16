@@ -817,35 +817,15 @@
                 to { transform: translateX(calc(-50% - 4px)); }
             }
 
-/* 1. Limit the images to a specific, smaller size */
 .image-viewer-frame {
-    display: block;
-    max-width: 350px;  /* Forces image to be no wider than 350 pixels */
-    max-height: 350px; /* Forces image to be no taller than 350 pixels */
-    width: 100%;       /* Ensures it fills the space if smaller than 350px */
-    height: auto;      /* Keeps the aspect ratio perfect */
-    object-fit: contain;
-    margin: 0 auto;
-    border: 1px solid var(--border-color);
-    background: var(--bg-main);
-}
-
-/* 2. Lock the window container to match the image size */
-.popup-window {
-    display: none;
-    position: fixed;
-    z-index: 2000;
-    width: auto;
-    min-width: 200px;  /* Prevents the window from getting too small */
-    background: var(--bg-box);
-    border: 1px solid var(--border-color);
-    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    resize: none; 
-    overflow: hidden;
-}
+                display: block;
+                max-width: 100%;
+                max-height: calc(100vh - 110px);
+                object-fit: contain;
+                margin: 0 auto;
+                border: 1px solid var(--border-color);
+                background: var(--bg-main);
+            }
 
 .popup-window::after {
     display: none; 
