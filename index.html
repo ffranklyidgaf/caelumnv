@@ -1081,9 +1081,6 @@
                             <div class="cell-title">relations.txt</div>
                             <div id="relations-carousel" class="relation-carousel">
                                 <div class="relation-carousel-track">
-                                    <button class="relation-carousel-button" type="button" onclick="openRelationsPopup(0)" aria-label="Open placeholder relation">
-                                        <span class="blank-profile"></span>
-                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1726,7 +1723,7 @@
             }
 
             function normalizeRelations(rows) {
-                const entries = rows
+                return rows
                     .map((row) => {
                         const values = getRowValues(row).map((value) => String(value || "").trim());
                         return {
@@ -1736,34 +1733,36 @@
                         };
                     })
                     .filter((entry) => entry.profile || entry.name || entry.description);
-
-                entries.push(placeholderRelation);
-                return entries.length ? entries : [placeholderRelation];
             }
 
             function renderRelationCarousel(entries) {
                 relationProfiles = entries;
-                activeRelationIndex = Math.min(activeRelationIndex, relationProfiles.length - 1);
+                activeRelationIndex = Math.min(activeRelationIndex, Math.max(0, relationProfiles.length - 1));
                 const carousel = document.getElementById("relations-carousel");
                 if (!carousel) return;
 
                 carousel.innerHTML = "";
+
+                if (!entries.length) return;
+
                 const track = document.createElement("div");
                 track.className = "relation-carousel-track";
 
+                // Duplicate entries so the marquee loops seamlessly.
+                // Both copies get click listeners so clicks work regardless of
+                // which visual copy the user happens to be hovering over.
                 entries.concat(entries).forEach((entry, index) => {
                     const relationIndex = index % entries.length;
                     const isDuplicate = index >= entries.length;
                     const button = document.createElement("button");
                     button.className = "relation-carousel-button";
                     button.type = "button";
+                    button.setAttribute("aria-label", "Open " + (entry.name || "relation profile"));
+                    button.addEventListener("click", () => openRelationsPopup(relationIndex));
 
                     if (isDuplicate) {
                         button.tabIndex = -1;
                         button.setAttribute("aria-hidden", "true");
-                    } else {
-                        button.setAttribute("aria-label", "Open " + (entry.name || "relation profile"));
-                        button.addEventListener("click", () => openRelationsPopup(relationIndex));
                     }
 
                     if (entry.profile) {
@@ -1868,7 +1867,7 @@
 
                 fetchSheetRows(sheetSources.relations)
                     .then((rows) => renderRelationCarousel(normalizeRelations(rows)))
-                    .catch(() => renderRelationCarousel([placeholderRelation]));
+                    .catch(() => renderRelationCarousel([]));
 
                 fetchSheetRows(sheetSources.visualArchive)
                     .then((rows) => renderArchiveImages(normalizeArchiveImages(rows)))
