@@ -817,20 +817,40 @@
                 to { transform: translateX(calc(-50% - 4px)); }
             }
 
-            .image-viewer-frame {
-                display: block;
-                max-width: 100%;
-                max-height: calc(100vh - 110px);
-                object-fit: contain;
-                margin: 0 auto;
-                border: 1px solid var(--border-color);
-                background: var(--bg-main);
-            }
+            ./* Update this class */
+.image-viewer-frame {
+    display: block;
+    max-width: none;  /* Allows the image to be its natural width */
+    max-height: none; /* Allows the image to be its natural height */
+    object-fit: none; /* Prevents resizing/stretching */
+    margin: 0 auto;
+    border: 1px solid var(--border-color);
+    background: var(--bg-main);
+}
 
-            .image-viewer-popup {
-                width: 420px;
-                height: 320px;
-            }
+/* Update the popup window to stop resizing */
+.popup-window {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    width: auto;      /* Change from fixed width to auto */
+    min-width: 240px;
+    min-height: 140px;
+    background: var(--bg-box);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /* REMOVE OR COMMENT OUT THESE TWO LINES */
+    /* resize: both; */
+    /* overflow: hidden; */
+}
+
+/* You can also hide the resize handle icon */
+.popup-window::after {
+    display: none; 
+}
 
             .archive-gallery {
                 --archive-gap: 4px;
