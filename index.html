@@ -750,6 +750,8 @@
                 min-width: 100%;
                 animation: relation-marquee 18s linear infinite;
                 will-change: transform;
+                /* gap between the two duplicate halves is 8px,
+                   so translate by exactly half the full track width */
             }
 
             .relation-carousel:hover .relation-carousel-track {
@@ -1530,7 +1532,7 @@
                 curr_track.volume = volume_slider.value / 100;
 
                 updateTimer = setInterval(seekUpdate, 1000);
-                curr_track.addEventListener("ended", nextTrack);
+                curr_track.onended = nextTrack;
 
                 if (shouldAutoPlay) {
                     playTrack();
@@ -1723,65 +1725,71 @@
                 });
             }
 
-            // 1. Corrected normalization: Only add placeholder if the list is empty
-function normalizeRelations(rows) {
-    const entries = rows
-        .map((row) => {
-            const values = getRowValues(row).map((value) => String(value || "").trim());
-            return {
-                profile: values[0] || getSheetValue(row, ["profile", "image", "img", "photo", "url", "column1"], 0),
-                name: values[1] || getSheetValue(row, ["name", "title", "column2"], 1),
-                description: values[2] || getSheetValue(row, ["description", "desc", "content", "contents", "column3"], 2)
-            };
-        })
-        .filter((entry) => entry.profile || entry.name || entry.description);
+            function normalizeRelations(rows) {
+                const entries = rows
+                    .map((row) => {
+                        const values = getRowValues(row).map((value) => String(value || "").trim());
+                        return {
+                            profile: values[0] || getSheetValue(row, ["profile", "image", "img", "photo", "url", "column1"], 0),
+                            name: values[1] || getSheetValue(row, ["name", "title", "column2"], 1),
+                            description: values[2] || getSheetValue(row, ["description", "desc", "content", "contents", "column3"], 2)
+                        };
+                    })
+                    .filter((entry) => entry.profile || entry.name || entry.description);
 
-    // Only add the placeholder if we have absolutely no data
-    return entries.length > 0 ? entries : [placeholderRelation];
-}
+                entries.push(placeholderRelation);
+                return entries.length ? entries : [placeholderRelation];
+            }
 
-// 2. Corrected renderer: Clean, simple, and safe
-function renderRelationCarousel(entries) {
-    // Filter to be safe, even if normalized
-    relationProfiles = entries.filter(e => e !== placeholderRelation);
-    
-    const carousel = document.getElementById("relations-carousel");
-    if (!carousel) return;
+            function renderRelationCarousel(entries) {
+                relationProfiles = entries;
+                activeRelationIndex = Math.min(activeRelationIndex, relationProfiles.length - 1);
+                const carousel = document.getElementById("relations-carousel");
+                if (!carousel) return;
 
-    carousel.innerHTML = "";
-    const track = document.createElement("div");
-    track.className = "relation-carousel-track";
+                carousel.innerHTML = "";
+                const track = document.createElement("div");
+                track.className = "relation-carousel-track";
 
-    // Loop through entries
-    entries.forEach((entry, index) => {
-        const button = document.createElement("button");
-        button.className = "relation-carousel-button";
-        button.type = "button";
-        
-        // Ensure index matches the array accurately
-        button.addEventListener("click", () => openRelationsPopup(index));
-        button.setAttribute("aria-label", "Open profile for " + (entry.name || "relation"));
+                entries.concat(entries).forEach((entry, index) => {
+                    const relationIndex = index % entries.length;
+                    const isDuplicate = index >= entries.length;
+                    const button = document.createElement("button");
+                    button.className = "relation-carousel-button";
+                    button.type = "button";
 
-        if (entry.profile && entry.profile !== "") {
-            const img = document.createElement("img");
-            img.src = entry.profile;
-            img.alt = entry.name || "relation profile";
-            button.appendChild(img);
-        } else {
-            const blank = document.createElement("span");
-            blank.className = "blank-profile";
-            button.appendChild(blank);
-        }
-        track.appendChild(button);
-    });
+                    if (isDuplicate) {
+                        button.tabIndex = -1;
+                        button.setAttribute("aria-hidden", "true");
+                    } else {
+                        button.setAttribute("aria-label", "Open " + (entry.name || "relation profile"));
+                        button.addEventListener("click", () => openRelationsPopup(relationIndex));
+                    }
 
-    carousel.appendChild(track);
-}
+                    if (entry.profile) {
+                        const img = document.createElement("img");
+                        img.src = entry.profile;
+                        img.alt = isDuplicate ? "" : (entry.name || "relation profile");
+                        button.appendChild(img);
+                    } else {
+                        const blank = document.createElement("span");
+                        blank.className = "blank-profile";
+                        button.appendChild(blank);
+                    }
+
+                    track.appendChild(button);
+                });
+
+                carousel.appendChild(track);
+                if (entries.length <= 1) {
+                    track.style.animation = "none";
+                }
 
                 const popup = document.getElementById("relations-popup");
                 if (popup && popup.style.display === "block") {
                     renderRelationPopup(activeRelationIndex);
                 }
+            }
 
             function renderRelationPopup(index) {
                 const relation = relationProfiles[index] || placeholderRelation;
@@ -1896,7 +1904,7 @@ function renderRelationCarousel(entries) {
 
             function openRelationsPopup(index = 0) {
                 activeRelationIndex = Number.isFinite(Number(index)) ? Number(index) : 0;
-                renderRelationPopup(index);
+                renderRelationPopup(activeRelationIndex);
                 const popup = document.getElementById("relations-popup");
                 popup.style.top = "50%";
                 popup.style.left = "50%";
