@@ -1740,48 +1740,42 @@
             }
 
             function renderRelationCarousel(entries) {
-                relationProfiles = entries;
-                activeRelationIndex = Math.min(activeRelationIndex, relationProfiles.length - 1);
-                const carousel = document.getElementById("relations-carousel");
-                if (!carousel) return;
+    // Filter out the placeholder so it doesn't show up in your list
+    const actualEntries = entries.filter(e => e !== placeholderRelation);
+    relationProfiles = actualEntries; 
+    
+    const carousel = document.getElementById("relations-carousel");
+    if (!carousel) return;
 
-                carousel.innerHTML = "";
-                const track = document.createElement("div");
-                track.className = "relation-carousel-track";
+    carousel.innerHTML = "";
+    const track = document.createElement("div");
+    track.className = "relation-carousel-track";
 
-                entries.concat(entries).forEach((entry, index) => {
-                    const relationIndex = index % entries.length;
-                    const isDuplicate = index >= entries.length;
-                    const button = document.createElement("button");
-                    button.className = "relation-carousel-button";
-                    button.type = "button";
+    // Loop through only your actual data
+    actualEntries.forEach((entry, index) => {
+        const button = document.createElement("button");
+        button.className = "relation-carousel-button";
+        button.type = "button";
+        // Make the whole button clickable
+        button.setAttribute("aria-label", "Open " + (entry.name || "relation profile"));
+        button.addEventListener("click", () => openRelationsPopup(index));
 
-                    if (isDuplicate) {
-                        button.tabIndex = -1;
-                        button.setAttribute("aria-hidden", "true");
-                    } else {
-                        button.setAttribute("aria-label", "Open " + (entry.name || "relation profile"));
-                        button.addEventListener("click", () => openRelationsPopup(relationIndex));
-                    }
+        if (entry.profile) {
+            const img = document.createElement("img");
+            img.src = entry.profile;
+            img.alt = entry.name || "relation profile";
+            button.appendChild(img);
+        } else {
+            const blank = document.createElement("span");
+            blank.className = "blank-profile";
+            button.appendChild(blank);
+        }
 
-                    if (entry.profile) {
-                        const img = document.createElement("img");
-                        img.src = entry.profile;
-                        img.alt = isDuplicate ? "" : (entry.name || "relation profile");
-                        button.appendChild(img);
-                    } else {
-                        const blank = document.createElement("span");
-                        blank.className = "blank-profile";
-                        button.appendChild(blank);
-                    }
+        track.appendChild(button);
+    });
 
-                    track.appendChild(button);
-                });
-
-                carousel.appendChild(track);
-                if (entries.length <= 1) {
-                    track.style.animation = "none";
-                }
+    carousel.appendChild(track);
+}
 
                 const popup = document.getElementById("relations-popup");
                 if (popup && popup.style.display === "block") {
