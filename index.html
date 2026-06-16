@@ -817,7 +817,7 @@
                 to { transform: translateX(calc(-50% - 4px)); }
             }
 
-.image-viewer-frame {
+            .image-viewer-frame {
                 display: block;
                 max-width: 100%;
                 max-height: calc(100vh - 110px);
@@ -827,9 +827,9 @@
                 background: var(--bg-main);
             }
 
-.popup-window::after {
-    display: none; 
-}
+            .popup-window::after {
+                display: none;     /* Hides the resize handle */
+            }
 
             .archive-gallery {
                 --archive-gap: 4px;
@@ -1740,47 +1740,54 @@
             }
 
             function renderRelationCarousel(entries) {
-    // Filter out the placeholder so it doesn't show up in your list
-    const actualEntries = entries.filter(e => e !== placeholderRelation);
-    relationProfiles = actualEntries; 
-    
-    const carousel = document.getElementById("relations-carousel");
-    if (!carousel) return;
+                relationProfiles = entries;
+                activeRelationIndex = Math.min(activeRelationIndex, relationProfiles.length - 1);
+                const carousel = document.getElementById("relations-carousel");
+                if (!carousel) return;
 
-    carousel.innerHTML = "";
-    const track = document.createElement("div");
-    track.className = "relation-carousel-track";
+                carousel.innerHTML = "";
+                const track = document.createElement("div");
+                track.className = "relation-carousel-track";
 
-    // Loop through only your actual data
-    actualEntries.forEach((entry, index) => {
-        const button = document.createElement("button");
-        button.className = "relation-carousel-button";
-        button.type = "button";
-        // Make the whole button clickable
-        button.setAttribute("aria-label", "Open " + (entry.name || "relation profile"));
-        button.addEventListener("click", () => openRelationsPopup(index));
+                entries.concat(entries).forEach((entry, index) => {
+                    const relationIndex = index % entries.length;
+                    const isDuplicate = index >= entries.length;
+                    const button = document.createElement("button");
+                    button.className = "relation-carousel-button";
+                    button.type = "button";
 
-        if (entry.profile) {
-            const img = document.createElement("img");
-            img.src = entry.profile;
-            img.alt = entry.name || "relation profile";
-            button.appendChild(img);
-        } else {
-            const blank = document.createElement("span");
-            blank.className = "blank-profile";
-            button.appendChild(blank);
-        }
+                    if (isDuplicate) {
+                        button.tabIndex = -1;
+                        button.setAttribute("aria-hidden", "true");
+                    } else {
+                        button.setAttribute("aria-label", "Open " + (entry.name || "relation profile"));
+                        button.addEventListener("click", () => openRelationsPopup(relationIndex));
+                    }
 
-        track.appendChild(button);
-    });
+                    if (entry.profile) {
+                        const img = document.createElement("img");
+                        img.src = entry.profile;
+                        img.alt = isDuplicate ? "" : (entry.name || "relation profile");
+                        button.appendChild(img);
+                    } else {
+                        const blank = document.createElement("span");
+                        blank.className = "blank-profile";
+                        button.appendChild(blank);
+                    }
 
-    carousel.appendChild(track);
-            }
+                    track.appendChild(button);
+                });
+
+                carousel.appendChild(track);
+                if (entries.length <= 1) {
+                    track.style.animation = "none";
+                }
 
                 const popup = document.getElementById("relations-popup");
                 if (popup && popup.style.display === "block") {
                     renderRelationPopup(activeRelationIndex);
                 }
+            }
 
             function renderRelationPopup(index) {
                 const relation = relationProfiles[index] || placeholderRelation;
