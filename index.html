@@ -1723,26 +1723,27 @@
                 });
             }
 
-            function normalizeRelations(rows) {
-                const entries = rows
-                    .map((row) => {
-                        const values = getRowValues(row).map((value) => String(value || "").trim());
-                        return {
-                            profile: values[0] || getSheetValue(row, ["profile", "image", "img", "photo", "url", "column1"], 0),
-                            name: values[1] || getSheetValue(row, ["name", "title", "column2"], 1),
-                            description: values[2] || getSheetValue(row, ["description", "desc", "content", "contents", "column3"], 2)
-                        };
-                    })
-                    .filter((entry) => entry.profile || entry.name || entry.description);
+            // 1. Corrected normalization: Only add placeholder if the list is empty
+function normalizeRelations(rows) {
+    const entries = rows
+        .map((row) => {
+            const values = getRowValues(row).map((value) => String(value || "").trim());
+            return {
+                profile: values[0] || getSheetValue(row, ["profile", "image", "img", "photo", "url", "column1"], 0),
+                name: values[1] || getSheetValue(row, ["name", "title", "column2"], 1),
+                description: values[2] || getSheetValue(row, ["description", "desc", "content", "contents", "column3"], 2)
+            };
+        })
+        .filter((entry) => entry.profile || entry.name || entry.description);
 
-                entries.push(placeholderRelation);
-                return entries.length ? entries : [placeholderRelation];
-            }
+    // Only add the placeholder if we have absolutely no data
+    return entries.length > 0 ? entries : [placeholderRelation];
+}
 
-            function renderRelationCarousel(entries) {
-    // 1. Remove the placeholder so it never appears
-    const realEntries = entries.filter(e => e !== placeholderRelation);
-    relationProfiles = realEntries;
+// 2. Corrected renderer: Clean, simple, and safe
+function renderRelationCarousel(entries) {
+    // Filter to be safe, even if normalized
+    relationProfiles = entries.filter(e => e !== placeholderRelation);
     
     const carousel = document.getElementById("relations-carousel");
     if (!carousel) return;
@@ -1751,13 +1752,13 @@
     const track = document.createElement("div");
     track.className = "relation-carousel-track";
 
-    // 2. Only render the real entries
-    realEntries.forEach((entry, index) => {
+    // Loop through entries
+    entries.forEach((entry, index) => {
         const button = document.createElement("button");
         button.className = "relation-carousel-button";
         button.type = "button";
         
-        // This makes the ENTIRE button clickable
+        // Ensure index matches the array accurately
         button.addEventListener("click", () => openRelationsPopup(index));
         button.setAttribute("aria-label", "Open profile for " + (entry.name || "relation"));
 
