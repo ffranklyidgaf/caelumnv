@@ -1147,11 +1147,11 @@
             </div>
             <div class="popup-body">
                 <div class="relation-detail">
-                    <span id="relation-popup-blank" class="relation-icon blank-profile"></span>
+                    <span id="relation-popup-blank" class="relation-icon blank-profile" hidden></span>
                     <img id="relation-popup-image" class="relation-icon" src="" alt="" hidden>
                     <div class="relation-detail-copy">
-                        <span id="relation-popup-name" class="relation-title">PLACEHOLDER</span>
-                        <p id="relation-popup-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                        <span id="relation-popup-name" class="relation-title"></span>
+                        <p id="relation-popup-description"></p>
                     </div>
                 </div>
             </div>
@@ -1616,13 +1616,7 @@
                 visualArchive: "https://sheetdb.io/api/v1/766ggd6eiv687"
             };
 
-            const placeholderRelation = {
-                profile: "",
-                name: "PLACEHOLDER",
-                description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-            };
-
-            let relationProfiles = [placeholderRelation];
+            let relationProfiles = [];
             let activeRelationIndex = 0;
             let topPopupZ = 2000;
 
@@ -1791,7 +1785,8 @@
             }
 
             function renderRelationPopup(index) {
-                const relation = relationProfiles[index] || placeholderRelation;
+                const relation = relationProfiles[index];
+                if (!relation) return;
                 const blank = document.getElementById("relation-popup-blank");
                 const image = document.getElementById("relation-popup-image");
                 const name = document.getElementById("relation-popup-name");
@@ -1808,8 +1803,8 @@
                     blank.hidden = false;
                 }
 
-                name.textContent = relation.name || placeholderRelation.name;
-                description.textContent = relation.description || placeholderRelation.description;
+                name.textContent = relation.name || "";
+                description.textContent = relation.description || "";
             }
 
             function normalizeArchiveImages(rows) {
