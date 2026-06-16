@@ -1,3 +1,6 @@
+
+
+
 <!doctype html>
 <html lang="en">
     <head>
@@ -737,7 +740,6 @@
                 width: 100%;
                 min-height: 78px;
                 overflow: hidden;
-                white-space: nowrap;
             }
 
             .relation-carousel-track {
@@ -746,27 +748,12 @@
                 gap: 8px;
                 width: max-content;
                 min-width: 100%;
-                animation: relation-carousel-marquee var(--relation-carousel-duration, 22s) linear infinite;
+                animation: relation-marquee 18s linear infinite;
                 will-change: transform;
-                transform: translate3d(0, 0, 0);
             }
 
-            .relation-carousel:hover .relation-carousel-track,
-            .relation-carousel:focus-within .relation-carousel-track {
+            .relation-carousel:hover .relation-carousel-track {
                 animation-play-state: paused;
-            }
-
-            .relation-carousel-track.is-static {
-                animation: none;
-            }
-
-            @keyframes relation-carousel-marquee {
-                from {
-                    transform: translate3d(0, 0, 0);
-                }
-                to {
-                    transform: translate3d(-50%, 0, 0);
-                }
             }
 
             .relation-carousel-button {
@@ -825,6 +812,11 @@
                 min-width: 0;
             }
 
+            @keyframes relation-marquee {
+                from { transform: translateX(0); }
+                to { transform: translateX(calc(-50% - 4px)); }
+            }
+
             .image-viewer-frame {
                 display: block;
                 max-width: 100%;
@@ -833,6 +825,11 @@
                 margin: 0 auto;
                 border: 1px solid var(--border-color);
                 background: var(--bg-main);
+            }
+
+            .image-viewer-popup {
+                width: 420px;
+                height: 320px;
             }
 
             .archive-gallery {
@@ -1193,7 +1190,7 @@
             </div>
         </div>
 
-        <div id="image-viewer-popup" class="popup-window">
+        <div id="image-viewer-popup" class="popup-window image-viewer-popup">
             <div class="popup-header" id="image-viewer-popup-header-drag">
                 <span>image_viewer.exe</span>
                 <div class="popup-dots">
@@ -1204,8 +1201,6 @@
                 <img id="image-viewer-frame" class="image-viewer-frame" src="" alt="archive preview">
             </div>
         </div>
-
-        <div id="image-viewer-stack"></div>
 
         <script>
             function updatePhilippinesTimeAndDate() {
@@ -1629,11 +1624,8 @@
                 description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
             };
 
-            const siteDataVersion = "2026-06-16-1";
-
             let relationProfiles = [placeholderRelation];
             let activeRelationIndex = 0;
-            let imageViewerCount = 0;
             let topPopupZ = 2000;
 
             function getSheetRows(data) {
@@ -1683,10 +1675,10 @@
             }
 
             async function fetchSheetRows(url) {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error("Sheet request failed: " + response.status);
+                const separator = url.includes("?") ? "&" : "?";
+                const response = await fetch(url + separator + "_=" + Date.now(), { cache: "no-store" });
+                if (!response.ok) throw new Error("Sheet request failed");
                 const data = await response.json();
-                console.log("SheetDB data:", url, data);
                 return getSheetRows(data);
             }
 
@@ -1732,60 +1724,17 @@
                 });
             }
 
-            function renderLogError(targetId, message) {
-                const target = document.getElementById(targetId);
-                if (!target) return;
-
-                target.innerHTML = "";
-                const entry = document.createElement("div");
-                entry.className = "log-entry";
-
-                const date = document.createElement("u");
-                date.textContent = "fetch error";
-                entry.appendChild(date);
-                entry.appendChild(document.createElement("br"));
-
-                const copy = document.createElement("p");
-                copy.textContent = message || "The log sheet could not be loaded.";
-                entry.appendChild(copy);
-                target.appendChild(entry);
-            }
-
-            function loadSheetLog(apiUrl, containerId) {
-                fetch(apiUrl)
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log(data);
-
-                        const container = document.getElementById(containerId);
-                        if (!container) return;
-
-                        container.innerHTML = "";
-
-                        data.forEach(log => {
-                            const entry = document.createElement("div");
-                            entry.className = "log-entry";
-                            entry.innerHTML = `<strong>${log.date || ""}</strong>: ${log.content || log.contents || ""}`;
-                            container.appendChild(entry);
-                        });
-                    })
-                    .catch(error => {
-                        console.error("SheetDB Error:", error);
-                        renderLogError(containerId, error.message);
-                    });
-            }
-
             function normalizeRelations(rows) {
                 const entries = rows
                     .map((row) => {
                         const values = getRowValues(row).map((value) => String(value || "").trim());
                         return {
                             profile: values[0] || getSheetValue(row, ["profile", "image", "img", "photo", "url", "column1"], 0),
-                            name: "",
-                            description: ""
+                            name: values[1] || getSheetValue(row, ["name", "title", "column2"], 1),
+                            description: values[2] || getSheetValue(row, ["description", "desc", "content", "contents", "column3"], 2)
                         };
                     })
-                    .filter((entry) => entry.profile);
+                    .filter((entry) => entry.profile || entry.name || entry.description);
 
                 entries.push(placeholderRelation);
                 return entries.length ? entries : [placeholderRelation];
@@ -1800,26 +1749,26 @@
                 carousel.innerHTML = "";
                 const track = document.createElement("div");
                 track.className = "relation-carousel-track";
-                const shouldAnimate = entries.length > 2;
-                const carouselItems = shouldAnimate ? entries.concat(entries) : entries;
-                const duration = Math.max(16, entries.length * 5);
-                track.style.setProperty("--relation-carousel-duration", duration + "s");
-                if (!shouldAnimate) {
-                    track.classList.add("is-static");
-                }
 
-                carouselItems.forEach((entry, carouselIndex) => {
-                    const relationIndex = carouselIndex % entries.length;
+                entries.concat(entries).forEach((entry, index) => {
+                    const relationIndex = index % entries.length;
+                    const isDuplicate = index >= entries.length;
                     const button = document.createElement("button");
                     button.className = "relation-carousel-button";
                     button.type = "button";
-                    button.setAttribute("aria-label", "Open relation profile");
-                    button.addEventListener("click", () => openRelationsPopup(relationIndex));
+
+                    if (isDuplicate) {
+                        button.tabIndex = -1;
+                        button.setAttribute("aria-hidden", "true");
+                    } else {
+                        button.setAttribute("aria-label", "Open " + (entry.name || "relation profile"));
+                        button.addEventListener("click", () => openRelationsPopup(relationIndex));
+                    }
 
                     if (entry.profile) {
                         const img = document.createElement("img");
                         img.src = entry.profile;
-                        img.alt = "relation profile";
+                        img.alt = isDuplicate ? "" : (entry.name || "relation profile");
                         button.appendChild(img);
                     } else {
                         const blank = document.createElement("span");
@@ -1831,16 +1780,36 @@
                 });
 
                 carousel.appendChild(track);
+                if (entries.length <= 1) {
+                    track.style.animation = "none";
+                }
 
-                activeRelationIndex = 0;
-            }
-
-            function startRelationCarouselAutoScroll() {
-                renderRelationCarousel(relationProfiles);
+                const popup = document.getElementById("relations-popup");
+                if (popup && popup.style.display === "block") {
+                    renderRelationPopup(activeRelationIndex);
+                }
             }
 
             function renderRelationPopup(index) {
-                return;
+                const relation = relationProfiles[index] || placeholderRelation;
+                const blank = document.getElementById("relation-popup-blank");
+                const image = document.getElementById("relation-popup-image");
+                const name = document.getElementById("relation-popup-name");
+                const description = document.getElementById("relation-popup-description");
+
+                if (relation.profile) {
+                    image.src = relation.profile;
+                    image.alt = relation.name || "relation profile";
+                    image.hidden = false;
+                    blank.hidden = true;
+                } else {
+                    image.hidden = true;
+                    image.removeAttribute("src");
+                    blank.hidden = false;
+                }
+
+                name.textContent = relation.name || placeholderRelation.name;
+                description.textContent = relation.description || placeholderRelation.description;
             }
 
             function normalizeArchiveImages(rows) {
@@ -1888,8 +1857,13 @@
             }
 
             async function loadDynamicContent() {
-                loadSheetLog(sheetSources.caeUpdate, "cae-update-list");
-                loadSheetLog(sheetSources.siteUpdate, "site-update-list");
+                fetchSheetRows(sheetSources.caeUpdate)
+                    .then((rows) => renderLogList("cae-update-list", rows))
+                    .catch(() => renderLogList("cae-update-list", []));
+
+                fetchSheetRows(sheetSources.siteUpdate)
+                    .then((rows) => renderLogList("site-update-list", rows))
+                    .catch(() => renderLogList("site-update-list", []));
 
                 fetchSheetRows(sheetSources.relations)
                     .then((rows) => renderRelationCarousel(normalizeRelations(rows)))
@@ -1929,6 +1903,7 @@
 
             function openRelationsPopup(index = 0) {
                 activeRelationIndex = Number.isFinite(Number(index)) ? Number(index) : 0;
+                renderRelationPopup(index);
                 const popup = document.getElementById("relations-popup");
                 popup.style.top = "50%";
                 popup.style.left = "50%";
@@ -1942,41 +1917,29 @@
             }
 
             function openImageViewer(url) {
-                const stack = document.getElementById("image-viewer-stack") || document.body;
-                const template = document.getElementById("image-viewer-popup");
-                if (!template) return;
-
-                imageViewerCount += 1;
-                const popup = template.cloneNode(true);
-                const popupId = "image-viewer-popup-" + imageViewerCount;
-                const headerId = popupId + "-header-drag";
-                const offset = ((imageViewerCount - 1) % 6) * 18;
-                const frame = popup.querySelector(".image-viewer-frame");
-                const header = popup.querySelector(".popup-header");
-                const closeButton = popup.querySelector("[data-close-popup]");
-
+                const popup = document.createElement("div");
+                const popupId = "image-viewer-popup-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
                 popup.id = popupId;
-                popup.removeAttribute("style");
-                popup.style.top = "calc(50% + " + offset + "px)";
-                popup.style.left = "calc(50% + " + offset + "px)";
+                popup.className = "popup-window image-viewer-popup";
+                popup.innerHTML = '<div class="popup-header" id="' + popupId + '-header-drag"><span>image_viewer.exe</span><div class="popup-dots"><button class="popup-close" type="button" aria-label="Close image popup">×</button></div></div><div class="popup-body"><img class="image-viewer-frame" src="" alt="archive preview"></div>';
+
+                const frame = popup.querySelector(".image-viewer-frame");
+                const closeButton = popup.querySelector(".popup-close");
+                frame.src = url;
+
+                closeButton.addEventListener("click", () => popup.remove());
+                frame.addEventListener("click", () => popup.remove());
+                popup.querySelector(".popup-body").addEventListener("click", (event) => {
+                    if (event.target === event.currentTarget) popup.remove();
+                });
+
+                document.body.appendChild(popup);
+                popup.style.top = "50%";
+                popup.style.left = "50%";
                 popup.style.transform = "translate(-50%, -50%)";
                 popup.style.display = "block";
-
-                if (header) {
-                    header.id = headerId;
-                }
-                if (frame) {
-                    frame.id = "image-viewer-frame-" + imageViewerCount;
-                    frame.src = url;
-                }
-                if (closeButton) {
-                    closeButton.dataset.closePopup = popupId;
-                }
-
-                stack.appendChild(popup);
-                dragElement(popup);
-                bindPopupCloseButton(closeButton);
                 bringPopupToFront(popup);
+                dragElement(popup);
             }
 
             dragElement(document.getElementById("archive-popup"));
@@ -2036,33 +1999,56 @@
 
             function bindPopupCloseButtons() {
                 document.querySelectorAll("[data-close-popup]").forEach((button) => {
-                    bindPopupCloseButton(button);
+                    const closeTarget = () => closePopupById(button.dataset.closePopup);
+
+                    button.addEventListener("pointerdown", (event) => {
+                        event.stopPropagation();
+                    });
+
+                    button.addEventListener("touchstart", (event) => {
+                        event.stopPropagation();
+                    }, { passive: true });
+
+                    button.addEventListener("touchend", (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        closeTarget();
+                    }, { passive: false });
+
+                    button.addEventListener("click", (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        closeTarget();
+                    });
                 });
             }
 
-            function bindPopupCloseButton(button) {
-                if (!button || button.dataset.closeBound === "true") return;
-                button.dataset.closeBound = "true";
-                const closeTarget = () => closePopupById(button.dataset.closePopup);
+            function bindImageViewerClose() {
+                const popup = document.getElementById("image-viewer-popup");
+                const frame = document.getElementById("image-viewer-frame");
+                if (!popup || !frame) return;
 
-                button.addEventListener("pointerdown", (event) => {
-                    event.stopPropagation();
+                frame.addEventListener("click", () => closePopupById("image-viewer-popup"));
+
+                popup.querySelector(".popup-body").addEventListener("click", (event) => {
+                    if (event.target === event.currentTarget) {
+                        closePopupById("image-viewer-popup");
+                    }
                 });
 
-                button.addEventListener("touchstart", (event) => {
-                    event.stopPropagation();
-                }, { passive: true });
+                document.addEventListener("keydown", (event) => {
+                    if (event.key === "Escape") {
+                        const imagePopups = [...document.querySelectorAll(".image-viewer-popup")]
+                            .filter((viewer) => viewer.style.display === "block");
+                        const topImagePopup = imagePopups.sort((a, b) => Number(b.style.zIndex || 0) - Number(a.style.zIndex || 0))[0];
 
-                button.addEventListener("touchend", (event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    closeTarget();
-                }, { passive: false });
-
-                button.addEventListener("click", (event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    closeTarget();
+                        if (!topImagePopup) return;
+                        if (topImagePopup.id === "image-viewer-popup") {
+                            closePopupById("image-viewer-popup");
+                        } else {
+                            topImagePopup.remove();
+                        }
+                    }
                 });
             }
 
@@ -2089,6 +2075,7 @@
 
             bindReadMoreToggles();
             bindPopupCloseButtons();
+            bindImageViewerClose();
 
             // Fire dynamic rotation loop sequencing
             rotateRandomMood();
