@@ -2062,6 +2062,8 @@
             // ADD THESE FUNCTIONS TO YOUR EXISTING SCRIPT BLOCK
             let calendarViewMonth = new Date().getMonth();
             let calendarViewYear = new Date().getFullYear();
+            // Map of "YYYY-MM-DD" -> array of event names for the popup calendar
+            let calendarEventMap = {};
 
             function openCalendarPopup() {
                 // Reset to current month each time popup opens
@@ -2073,7 +2075,7 @@
                 popup.style.transform = "translate(-50%, -50%)";
                 popup.style.display = "block";
                 bringPopupToFront(popup);
-                renderCalendar();
+                fetchCalendarEventsForMonth(calendarViewYear, calendarViewMonth).then(renderCalendar);
             }
 
             function closeCalendarPopup() {
@@ -2084,7 +2086,41 @@
                 calendarViewMonth += delta;
                 if (calendarViewMonth > 11) { calendarViewMonth = 0; calendarViewYear++; }
                 if (calendarViewMonth < 0)  { calendarViewMonth = 11; calendarViewYear--; }
-                renderCalendar();
+                renderCalendar(); // render immediately with existing data
+                fetchCalendarEventsForMonth(calendarViewYear, calendarViewMonth).then(renderCalendar);
+            }
+
+            function fetchCalendarEventsForMonth(year, month) {
+                const timeMin = encodeURIComponent(new Date(year, month, 1).toISOString());
+                const timeMax = encodeURIComponent(new Date(year, month + 1, 0, 23, 59, 59).toISOString());
+
+                const fetches = gcalIds.map(id =>
+                    fetch(
+                        "https://www.googleapis.com/calendar/v3/calendars/" +
+                        encodeURIComponent(id) +
+                        "/events?key=" + gcalApiKey +
+                        "&timeMin=" + timeMin +
+                        "&timeMax=" + timeMax +
+                        "&maxResults=50&singleEvents=true&orderBy=startTime"
+                    )
+                    .then(r => r.ok ? r.json() : null)
+                    .then(data => {
+                        if (!data || !data.items) return [];
+                        return data.items.map(ev => ({
+                            name: ev.summary || "Event",
+                            date: (ev.start.dateTime || ev.start.date).slice(0, 10)
+                        }));
+                    })
+                    .catch(() => [])
+                );
+
+                return Promise.all(fetches).then(results => {
+                    calendarEventMap = {};
+                    results.flat().forEach(ev => {
+                        if (!calendarEventMap[ev.date]) calendarEventMap[ev.date] = [];
+                        calendarEventMap[ev.date].push(ev.name);
+                    });
+                });
             }
 
             function renderCalendar() {
@@ -2126,10 +2162,22 @@
                 }
                 for (let day = 1; day <= daysInMonth; day++) {
                     const isToday = isCurrentMonth && day === todayDate;
-                    const style = isToday
-                        ? `background:var(--text-accent);color:#0b0f17;border-radius:3px;font-weight:bold;`
+                    const dateKey = year + "-" + String(month + 1).padStart(2, "0") + "-" + String(day).padStart(2, "0");
+                    const events  = calendarEventMap[dateKey] || [];
+                    const hasEvent = events.length > 0;
+                    const title   = hasEvent ? events.join(", ") : "";
+
+                    let cellStyle = "text-align:center;padding:4px 3px;position:relative;";
+                    if (isToday) {
+                        cellStyle += "background:var(--text-accent);color:#0b0f17;border-radius:3px;font-weight:bold;";
+                    }
+
+                    const dot = hasEvent
+                        ? `<span style="display:block;width:4px;height:4px;border-radius:50%;background:${isToday ? "#0b0f17" : "var(--text-accent)"};margin:1px auto 0;"></span>`
                         : "";
-                    html += `<td style="text-align:center;padding:4px 3px;${style}">${day}</td>`;
+
+                    html += `<td style="${cellStyle}"${title ? ` title="${title.replace(/"/g, "&quot;")}"` : ""}>${day}${dot}</td>`;
+
                     if ((day + firstDay) % 7 === 0 && day < daysInMonth) html += "</tr><tr>";
                 }
                 html += "</tr></table>";
