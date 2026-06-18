@@ -1032,10 +1032,16 @@
 
                     <div class="terminal-card">
                         <div class="terminal-header">calendar <div class="dots"><span>_</span><span>▢</span><span>×</span></div></div>
-                        <div class="terminal-body">
-                            <span id="calendar-today-display" style="color:var(--text-heading);"></span>
-                            <div class="line" style="margin-top:4px;margin-bottom:4px;"></div>
-                            <a href="javascript:void(0);" onclick="openCalendarPopup()">View Calendar &raquo;</a>
+                        <div class="terminal-body" style="padding:10px 8px;">
+                            <div id="calendar-today-display" style="
+                                font-family: monospace;
+                                font-size: 13px;
+                                color: var(--text-heading);
+                                line-height: 1.6;
+                                letter-spacing: 0.5px;
+                            "></div>
+                            <div class="line" style="margin-top:8px;margin-bottom:6px;"></div>
+                            <a href="javascript:void(0);" onclick="openCalendarPopup()" style="font-size:10px;">View Calendar &raquo;</a>
                         </div>
                     </div>
                 </aside>
@@ -2137,7 +2143,10 @@
                 const now = new Date();
                 const dayNames   = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
                 const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-                el.textContent = monthNames[now.getMonth()] + " " + now.getDate() + ", " + now.getFullYear() + " — " + dayNames[now.getDay()];
+                el.innerHTML =
+                    "<span style='font-size:15px;font-weight:bold;'>" + monthNames[now.getMonth()] + " " + now.getDate() + "</span>" +
+                    "<br>" +
+                    "<span style='color:var(--text-main);font-size:11px;'>" + now.getFullYear() + " &mdash; " + dayNames[now.getDay()] + "</span>";
             })();
 
             // Ensure the calendar is draggable
