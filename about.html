@@ -1,0 +1,2054 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>CAELUM — about</title>
+
+        <link rel="icon" type="image/png" href="icon.png">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+
+        <style>
+            :root {
+                --space: 8px;
+                --bg-main: #0b0f17;
+                --bg-box: #131824;
+                --border-color: #243146;
+                --text-main: #9cb1c9;
+                --text-accent: #6fa0db;
+                --text-heading: #eef5fc;
+            }
+
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            html, body {
+                height: 100%;
+                background-color: var(--bg-main);
+            }
+
+            body {
+                font: 11px calibri, tahoma, verdana, arial, sans-serif;
+                color: var(--text-main);
+                text-shadow: 0px 1px 1px #000;
+                letter-spacing: 0.5px;
+                line-height: 14px;
+                padding: 20px;
+                overflow-y: auto;
+            }
+
+            /* CRT scanline effect */
+            body::before {
+                content: "";
+                position: fixed;
+                inset: 0;
+                background: repeating-linear-gradient(
+                    to bottom,
+                    rgba(255, 255, 255, 0.006),
+                    rgba(255, 255, 255, 0.006) 1px,
+                    transparent 1px,
+                    transparent 2px
+                );
+                pointer-events: none;
+                z-index: 1000;
+            }
+
+            .shell {
+                margin: 0 auto;
+                width: 100%;
+                max-width: 640px;
+                background: var(--bg-main);
+                padding: 0 var(--space) var(--space) var(--space);
+            }
+
+            .top-deck {
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                background: var(--bg-main);
+                border-bottom: 1px dashed var(--border-color);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 6px 0;
+                margin-bottom: var(--space);
+            }
+
+            .top-deck .brand {
+                font-family: monospace, sans-serif;
+                font-size: 10px;
+                font-weight: bold;
+                color: var(--text-heading);
+            }
+
+            .top-deck .readout {
+                font-family: monospace, sans-serif;
+                font-size: 10px;
+                color: var(--text-main);
+                flex: 1;
+                text-align: center;
+            }
+
+            .top-deck .shortcuts {
+                font-family: monospace, sans-serif;
+                font-size: 10px;
+            }
+
+            .top-deck .shortcuts a {
+                color: #8cb4e2;
+                text-decoration: none;
+                margin-left: 6px;
+            }
+            .top-deck .shortcuts a:hover {
+                color: var(--text-accent);
+            }
+
+            .billboard {
+                border: 1px solid var(--border-color);
+                padding: 35px 15px;
+                background: #0e131f;
+                text-align: center;
+                margin-top: var(--space);
+                margin-bottom: 0;
+            }
+
+            .billboard-title {
+                font: 22px georgia, serif;
+                letter-spacing: 3px;
+                color: var(--text-accent);
+            }
+
+            .billboard-caption {
+                margin-top: 6px;
+                font-style: italic;
+                font-size: 10px;
+                color: #61778f;
+            }
+
+            .deck-nav {
+                border: 1px solid var(--border-color);
+                border-top: none;
+                background: var(--bg-main);
+                padding: 4px var(--space);
+                margin-bottom: var(--space);
+                text-align: center;
+            }
+
+            .deck-nav a {
+                font-family: monospace, sans-serif;
+                font-size: 9px;
+                text-transform: uppercase;
+                color: #8cb4e2;
+                text-decoration: none;
+                padding: 3px 6px;
+                margin: 0 1px;
+                background: var(--bg-box);
+                border: 1px dotted var(--border-color);
+            }
+            .deck-nav a:hover {
+                color: #fff;
+                background: #2a374d;
+            }
+
+            .workspace {
+                display: flex;
+                gap: var(--space);
+            }
+
+            .left-pane {
+                width: 190px;
+                flex-shrink: 0;
+            }
+
+            .right-pane {
+                flex-grow: 1;
+                width: 0;
+            }
+
+            .terminal-card {
+                margin-bottom: var(--space);
+            }
+
+            .terminal-header {
+                font-family: monospace, sans-serif;
+                font-size: 9px;
+                font-weight: bold;
+                text-transform: uppercase;
+                color: var(--text-heading);
+                background: #17202e;
+                padding: 4px 6px;
+                border: 1px solid var(--border-color);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .terminal-header .dots {
+                float: right;
+                display: flex;
+                gap: 3px;
+            }
+            .terminal-header .dots span {
+                width: 11px;
+                height: 11px;
+                border: 1px solid var(--border-color);
+                font-family: monospace, sans-serif;
+                font-size: 9px;
+                line-height: 9px;
+                text-align: center;
+                color: var(--text-accent);
+                cursor: pointer;
+                opacity: 0.7;
+                background: transparent;
+            }
+            .terminal-header .dots span:hover {
+                background: var(--border-color);
+                color: #fff;
+                opacity: 1;
+            }
+
+            .terminal-body {
+                background: var(--bg-box);
+                border: 1px solid var(--border-color);
+                border-top: none;
+                padding: 8px;
+            }
+
+            .terminal-body p {
+                margin-bottom: 6px;
+            }
+
+            .read-more-copy {
+                display: -webkit-box;
+                max-height: 70px;
+                overflow: hidden;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 5;
+            }
+
+            .read-more-copy.is-expanded {
+                display: block;
+                max-height: none;
+                -webkit-line-clamp: unset;
+            }
+
+            .read-more-toggle {
+                appearance: none;
+                -webkit-appearance: none;
+                border: 0;
+                background: transparent;
+                color: #8cb4e2;
+                cursor: pointer;
+                font: inherit;
+                letter-spacing: inherit;
+                padding: 0;
+                text-shadow: inherit;
+                touch-action: manipulation;
+            }
+
+            .read-more-toggle:hover,
+            .read-more-toggle:focus-visible {
+                color: var(--text-accent);
+                outline: none;
+                text-decoration: underline;
+            }
+
+            b { font-weight: bold; color: #fff; }
+            i { color: var(--text-accent); font-style: normal; }
+            s { color: #354457; }
+            u { color: var(--text-accent); text-decoration: none; font-weight: bold; }
+
+            a:link, a:visited, a:active {
+                color: #8cb4e2;
+                text-decoration: none;
+            }
+            a:hover { color: var(--text-accent); text-decoration: underline; }
+            img, iframe { border: 0; }
+
+            blockquote {
+                margin-left: 20px;
+                margin-right: 20px;
+                text-align: justify;
+            }
+
+            .center { text-align: center; }
+
+            .line {
+                height: 0px;
+                border-bottom: 1px dashed var(--border-color);
+                margin-top: 4px;
+                margin-bottom: 4px;
+            }
+
+            .twin-grid {
+                display: flex;
+                gap: var(--space);
+                margin-bottom: var(--space);
+            }
+
+            .grid-cell {
+                flex: 1;
+                background: var(--bg-box);
+                border: 1px solid var(--border-color);
+                padding: 6px;
+            }
+
+            .cell-title {
+                font-family: monospace, sans-serif;
+                font-size: 9px;
+                font-weight: bold;
+                text-transform: uppercase;
+                color: var(--text-accent);
+                border-bottom: 1px dotted var(--border-color);
+                padding-bottom: 2px;
+                margin-bottom: 4px;
+            }
+
+            .log-list {
+                overflow-y: auto;
+                padding-right: 4px;
+            }
+
+            .site-update-list {
+                max-height: 78px;
+            }
+
+            .log-entry p {
+                margin-bottom: 0;
+            }
+
+            .log-list::-webkit-scrollbar,
+            .relation-carousel::-webkit-scrollbar {
+                width: 5px;
+                height: 5px;
+            }
+
+            .log-list::-webkit-scrollbar-track,
+            .relation-carousel::-webkit-scrollbar-track {
+                background: var(--bg-main);
+            }
+
+            .log-list::-webkit-scrollbar-thumb,
+            .relation-carousel::-webkit-scrollbar-thumb {
+                background: var(--border-color);
+            }
+
+            .relations-cell {
+                overflow: hidden;
+            }
+
+            .relation-carousel {
+                position: relative;
+                width: 100%;
+                min-height: 78px;
+                overflow: hidden;
+            }
+
+            .relation-carousel-track {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                width: max-content;
+                min-width: 100%;
+                animation: relation-marquee 18s linear infinite;
+                will-change: transform;
+            }
+
+            .relation-carousel:hover .relation-carousel-track {
+                animation-play-state: paused;
+            }
+
+            .relation-carousel-button {
+                appearance: none;
+                -webkit-appearance: none;
+                width: 54px;
+                height: 54px;
+                border-radius: 50%;
+                border: 1px solid var(--border-color);
+                background: var(--bg-main);
+                padding: 3px;
+                flex: 0 0 auto;
+                cursor: pointer;
+                overflow: hidden;
+                opacity: 0.78;
+                touch-action: manipulation;
+            }
+
+            .relation-carousel-button:hover,
+            .relation-carousel-button:focus-visible {
+                opacity: 1;
+                border-color: var(--text-accent);
+                outline: none;
+            }
+
+            .relation-carousel-button img {
+                display: block;
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+
+            .blank-profile {
+                display: block;
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
+                background: repeating-linear-gradient(135deg, #111622, #111622 6px, #17202e 6px, #17202e 12px);
+            }
+
+            @keyframes relation-marquee {
+                from { transform: translateX(0); }
+                to { transform: translateX(calc(-50% - 4px)); }
+            }
+
+            .relation-detail {
+                display: flex;
+                gap: 12px;
+                align-items: flex-start;
+            }
+
+            .relation-detail-copy {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .relation-title {
+                display: block;
+                color: var(--text-heading);
+                font-weight: bold;
+                margin-bottom: 2px;
+            }
+
+            .relation-icon {
+                width: 54px;
+                height: 54px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 1px solid var(--border-color);
+                background: var(--bg-main);
+                padding: 3px;
+                flex-shrink: 0;
+                opacity: 0.9;
+            }
+
+            .profile-card {
+                display: flex;
+                gap: 12px;
+                align-items: flex-start;
+            }
+
+            .profile-icon {
+                width: 76px;
+                height: 76px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 1px solid var(--border-color);
+                background: var(--bg-main);
+                padding: 3px;
+                flex-shrink: 0;
+                opacity: 0.9;
+            }
+
+            .profile-copy {
+                flex: 1;
+                min-width: 0;
+            }
+
+            /* -------------------------------------------------------------
+            Music Player UI Core Styles
+            ---------------------------------------------------------------- */
+            #audio-deck {
+                width: 100%;
+                font-family: 'Inter', sans-serif;
+            }
+            #audio-deck .meta-box {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                position: relative;
+                margin-bottom: 6px;
+            }
+            #audio-deck .cover-art {
+                width: 42px;
+                height: 44px;
+                background-size: cover;
+                background-position: center;
+                border: 1px solid var(--border-color);
+                border-radius: 2px;
+                flex-shrink: 0;
+            }
+            #audio-deck .counter {
+                position: absolute;
+                top: 0;
+                right: 0;
+                font-size: 7px;
+                font-family: monospace;
+                color: var(--text-accent);
+                opacity: 0.6;
+            }
+            #audio-deck .title-lbl {
+                font-size: 11px;
+                font-weight: 700;
+                color: #fff;
+                max-width: 110px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            #audio-deck .artist-lbl {
+                font-size: 10px;
+                color: var(--text-main);
+                max-width: 110px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            #audio-deck .timeline-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 4px;
+                margin-bottom: 6px;
+            }
+            #audio-deck .timestamp {
+                font-size: 8px;
+                font-family: monospace;
+                color: var(--text-main);
+            }
+            #audio-deck .scrub-bar {
+                width: 55%;
+                -webkit-appearance: none;
+                appearance: none;
+                height: 3px;
+                background: var(--border-color);
+                outline: none;
+                cursor: pointer;
+            }
+            #audio-deck .scrub-bar::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 7px;
+                height: 7px;
+                background: var(--text-accent);
+            }
+            #audio-deck .scrub-bar::-moz-range-thumb {
+                width: 7px;
+                height: 7px;
+                border: none;
+                background: var(--text-accent);
+            }
+            #audio-deck .volume-container {
+                display: flex;
+                justify-content: center;
+                margin-bottom: 8px;
+            }
+            #audio-deck .volume-trigger {
+                position: relative;
+                display: flex;
+                align-items: center;
+                padding: 4px;
+                cursor: pointer;
+                color: var(--text-main);
+            }
+            #audio-deck .volume-trigger i { font-size: 10px; }
+            #audio-deck .volume-slider-wrapper {
+                width: 0;
+                overflow: hidden;
+                transition: width 0.3s ease, margin-left 0.3s ease;
+                margin-left: 0;
+                display: flex;
+                align-items: center;
+            }
+            #audio-deck .volume-trigger:hover .volume-slider-wrapper,
+            #audio-deck .volume-trigger:focus-within .volume-slider-wrapper {
+                width: 60px;
+                margin-left: 6px;
+            }
+            #audio-deck .volume_slider {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 60px;
+                height: 3px;
+                background: var(--border-color);
+                outline: none;
+                cursor: pointer;
+            }
+            #audio-deck .volume_slider::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 6px;
+                height: 6px;
+                background: var(--text-main);
+            }
+            #audio-deck .volume_slider::-moz-range-thumb {
+                width: 6px;
+                height: 6px;
+                border: none;
+                background: var(--text-main);
+            }
+            #audio-deck .controls-row {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 16px;
+            }
+            #audio-deck .action-trigger {
+                cursor: pointer;
+                opacity: 0.7;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            #audio-deck .action-trigger:hover { opacity: 1; }
+            #audio-deck .action-trigger svg {
+                fill: var(--text-main);
+                width: 11px;
+                height: 11px;
+            }
+            #audio-deck .action-trigger i { color: var(--text-accent); }
+
+            /* -------------------------------------------------------------
+            Popup / Drag Window Styles
+            ---------------------------------------------------------------- */
+            .popup-window {
+                display: none;
+                position: fixed;
+                z-index: 2000;
+                width: 280px;
+                min-width: 240px;
+                min-height: 140px;
+                max-width: calc(100vw - 28px);
+                max-height: calc(100vh - 28px);
+                background: var(--bg-box);
+                border: 1px solid var(--border-color);
+                box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                overflow: hidden;
+            }
+
+            .popup-window::after {
+                display: none;
+            }
+
+            .popup-header {
+                background: #17202e;
+                padding: 5px 8px;
+                font-family: monospace;
+                font-size: 10px;
+                font-weight: bold;
+                color: var(--text-heading);
+                border-bottom: 1px solid var(--border-color);
+                cursor: move;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                user-select: none;
+            }
+
+            .popup-dots button {
+                appearance: none;
+                -webkit-appearance: none;
+                display: inline-block;
+                width: 13px;
+                height: 13px;
+                border: 1px solid var(--border-color);
+                font-size: 10px;
+                line-height: 11px;
+                text-align: center;
+                color: var(--text-accent);
+                cursor: pointer;
+                background: #111622;
+                padding: 0;
+                touch-action: manipulation;
+                font-family: monospace;
+            }
+
+            .popup-close {
+                position: relative;
+                z-index: 1;
+            }
+
+            .popup-dots button:hover,
+            .popup-dots button:focus-visible {
+                background: #cc2424;
+                color: #fff;
+                border-color: #cc2424;
+                outline: none;
+            }
+
+            @media (hover: none) and (pointer: coarse) {
+                .popup-dots button {
+                    min-width: 28px;
+                    min-height: 28px;
+                    line-height: 26px;
+                    font-size: 14px;
+                }
+            }
+
+            .popup-body {
+                padding: 10px;
+                font-family: monospace;
+                max-height: calc(100% - 25px);
+                overflow: auto;
+            }
+
+            #archive-popup {
+                width: 360px;
+                height: 250px;
+            }
+
+            #calendar-popup {
+                width: 380px;
+                height: 320px;
+            }
+
+            .archive-gallery {
+                --archive-gap: 4px;
+                display: grid;
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+                gap: var(--archive-gap);
+                max-height: calc(100% - 24px);
+                overflow-y: auto;
+                padding-right: 3px;
+            }
+
+            .archive-gallery a {
+                display: block;
+                aspect-ratio: 1;
+                background: var(--bg-main);
+                border: 1px solid var(--border-color);
+                overflow: hidden;
+            }
+
+            .archive-gallery img {
+                display: block;
+                width: 100%;
+                height: 100%;
+                aspect-ratio: 1;
+                object-fit: cover;
+                opacity: 0.75;
+                transition: opacity 0.2s, transform 0.1s;
+            }
+
+            .archive-gallery img:hover {
+                opacity: 1;
+                transform: scale(1.03);
+            }
+
+            .archive-gallery::-webkit-scrollbar { width: 5px; }
+            .archive-gallery::-webkit-scrollbar-track { background: var(--bg-main); }
+            .archive-gallery::-webkit-scrollbar-thumb { background: var(--border-color); }
+
+            .base-floor {
+                border: 1px solid var(--border-color);
+                background: var(--bg-box);
+                padding: 4px;
+                text-align: center;
+                margin-top: var(--space);
+                font-size: 10px;
+            }
+
+            @media (max-width: 800px) {
+                .workspace { flex-direction: column; }
+                .left-pane, .right-pane { width: 100%; }
+                .top-deck .readout { display: none; }
+            }
+            @media (max-width: 600px) {
+                .profile-card { display: block; }
+                .profile-icon {
+                    display: block;
+                    margin: 0 auto 8px;
+                }
+                .archive-gallery {
+                    grid-template-columns: repeat(4, minmax(0, 1fr));
+                    max-height: 185px;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="shell">
+
+            <header class="top-deck">
+                <div class="brand">caelumnv_sys</div>
+                <div id="text-clock" class="readout">
+                    <span id="philippines-time"></span> // <span id="weatherWidget">⏳</span>
+                </div>
+                <div class="shortcuts">
+                    <a href="#">wardrobe.</a>
+                    <a href="#">spotify.</a>
+                    <a href="#">???.</a>
+                </div>
+            </header>
+
+            <div class="billboard">
+                <div class="billboard-inner">
+                    <div class="billboard-title">caelumnv.com</div>
+                    <div class="billboard-caption">
+                        The horizon is a promise that keeps moving so ambition learns endurance.
+                    </div>
+                </div>
+            </div>
+
+            <div class="deck-nav">
+                <nav>
+                    <a href="index.html">home</a>
+                    <a href="about.html">about</a>
+                    <a href="#">photos</a>
+                    <a href="#">projects</a>
+                    <a href="#">links</a>
+                    <a href="#">guestbook</a>
+                </nav>
+            </div>
+
+            <div class="workspace">
+
+                <aside class="left-pane">
+                    <div class="terminal-card">
+                        <div class="terminal-header">disclaimer <div class="dots"><span>_</span><span>▢</span><span>×</span></div></div>
+                        <div class="terminal-body">
+                            <p id="disclaimer-copy" class="read-more-copy"><b>This account is not affiliated with any of the artists, their teams, or their official representatives.</b> It is created solely for <u>roleplaying and entertainment purposes</u>. All characters, settings, and scenarios are fictional, and any resemblance to real individuals or organizations is purely coincidental. <b>No ownership is claimed over any media used in roleplay content;</b> all rights remain with their respective owners. If anything shared here causes discomfort or concern, feel free to reach out directly.</p>
+                            <div class="line"></div>
+                            <button class="read-more-toggle" type="button" data-read-more-target="disclaimer-copy" aria-expanded="false" aria-controls="disclaimer-copy">Read More &raquo;</button>
+                        </div>
+                    </div>
+
+                    <div class="terminal-card">
+                        <div class="terminal-header">before you follow <div class="dots"><span>_</span><span>▢</span><span>×</span></div></div>
+                        <div class="terminal-body">
+                            <p id="before-follow-copy" class="read-more-copy">Roleplay account. More active on tl than in DMs, so expect random interactions/replies. <b>Strictly platonic flirting.</b> English and Filipino plotting; mirrored semi-descriptive or descriptive lit. Does not typically use tone indicators. <u>Friends over followers.</u> IC and OOC are kept separate at all times. <b>Soft block to unfollow.</b></p>
+                            <div class="line"></div>
+                            <button class="read-more-toggle" type="button" data-read-more-target="before-follow-copy" aria-expanded="false" aria-controls="before-follow-copy">Read More &raquo;</button>
+                        </div>
+                    </div>
+
+                    <div class="terminal-card">
+                        <div class="terminal-header">status <div class="dots"><span>_</span><span>▢</span><span>×</span></div></div>
+                        <div class="terminal-body">
+                            <b>Currently:</b> <span id="dynamic-mood-field" style="color: var(--text-accent);">bored 😴</span>
+                        </div>
+                    </div>
+
+                    <div class="terminal-card">
+                        <div class="terminal-header">
+                            listening now..
+                            <div class="dots"><span>_</span><span>▢</span><span>×</span></div>
+                        </div>
+                        <div class="terminal-body">
+                            <div id="audio-deck">
+                                <div class="meta-box">
+                                    <div class="cover-art"></div>
+                                    <div class="counter">PLAYING x OF y</div>
+                                    <div style="display:flex; flex-direction:column;">
+                                        <div class="title-lbl">Track Name</div>
+                                        <div class="artist-lbl">Track Artist</div>
+                                    </div>
+                                </div>
+                                <div class="timeline-row">
+                                    <div class="timestamp current-time">00:00</div>
+                                    <input type="range" min="1" max="100" value="0" class="scrub-bar" onchange="seekTo()">
+                                    <div class="timestamp total-duration">00:00</div>
+                                </div>
+                                <div class="volume-container">
+                                    <div class="volume-trigger">
+                                        <i class="fa fa-volume-down"></i>
+                                        <div class="volume-slider-wrapper">
+                                            <input type="range" min="0" max="100" value="80" class="volume_slider" oninput="setVolume()">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="controls-row">
+                                    <div class="action-trigger prev-track" onclick="prevTrack()">
+                                        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M30.71,229.47l188.87-113a30.54,30.54,0,0,1,31.09-.39,33.74,33.74,0,0,1,16.76,29.47V224.6L448.15,116.44a30.54,30.54,0,0,1,31.09-.39L496,145.52v221A33.73,33.73,0,0,1,479.24,396a30.54,30.54,0,0,1-31.09-.39L267.43,287.4v79.08A33.73,33.73,0,0,1,250.67,396a30.54,30.54,0,0,1-31.09-.39l-188.87-113a31.27,31.27,0,0,1,0-53Z"/></svg>
+                                    </div>
+                                    <div class="action-trigger playpause-track" onclick="playpauseTrack()">
+                                        <i class="fa fa-play fa-sm"></i>
+                                    </div>
+                                    <div class="action-trigger next-track" onclick="nextTrack()">
+                                        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M481.29,229.47l-188.87-113a30.54,30.54,0,0,0-31.09-.39,33.74,33.74,0,0,0-16.76,29.47V224.6L63.85,116.44a30.54,30.54,0,0,0-31.09-.39A33.74,33.74,0,0,0,16,145.52v221A33.74,33.74,0,0,0,32.76,396a30.54,30.54,0,0,0,31.09-.39L244.57,287.4v79.08A33.74,33.74,0,0,0,261.33,396a30.54,30.54,0,0,0,31.09-.39l188.87-113a31.27,31.27,0,0,0,0-53Z"/></svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="terminal-card">
+                        <div class="terminal-header">currently <div class="dots"><span>_</span><span>▢</span><span>×</span></div></div>
+                        <div class="terminal-body">
+                            <b>Date</b> <span id="current-date">--.--.----</span><br>
+                            <b>Weather</b> <span id="current-weather">loading...</span><br>
+                            <b>Watching</b> organic chem tutor<br>
+                            <b>Coding</b> terminal build<br>
+                            <b>Eating</b> <span id="current-eating">breakfast</span><br>
+                            <b>Drinking</b> <span id="current-drinking">coffee</span><br>
+                            <b>Loving</b> myself<br>
+                            <b>Hating</b> integration
+                        </div>
+                    </div>
+
+                    <div class="terminal-card">
+                        <div class="terminal-header">calendar <div class="dots"><span>_</span><span>▢</span><span>×</span></div></div>
+                        <div class="terminal-body" style="padding:10px 8px;">
+                            <div id="calendar-today-display" style="
+                                font-family: monospace;
+                                font-size: 13px;
+                                color: var(--text-heading);
+                                line-height: 1.6;
+                                letter-spacing: 0.5px;
+                            "></div>
+                            <div class="line" style="margin-top:8px;margin-bottom:6px;"></div>
+                            <a href="javascript:void(0);" onclick="openCalendarPopup()" style="font-size:10px;">View Calendar &raquo;</a>
+                        </div>
+                    </div>
+                </aside>
+
+                <div class="right-pane">
+
+                    <!-- Draggable Calendar Popup -->
+                    <div id="calendar-popup" class="popup-window">
+                        <div class="popup-header" id="calendar-popup-header-drag">
+                            <span>caelum's calendar</span>
+                            <div class="popup-dots">
+                                <button class="popup-close" type="button" data-close-popup="calendar-popup" aria-label="Close calendar popup">×</button>
+                            </div>
+                        </div>
+                        <div class="popup-body" id="calendar-body">
+                            <div id="calendar-content"></div>
+                        </div>
+                    </div>
+
+                    <!-- Draggable Archive Popup -->
+                    <div id="archive-popup" class="popup-window">
+                        <div class="popup-header" id="archive-popup-header-drag">
+                            <span>archive_viewer.exe</span>
+                            <div class="popup-dots">
+                                <button class="popup-close" type="button" data-close-popup="archive-popup" aria-label="Close archive popup">×</button>
+                            </div>
+                        </div>
+                        <div class="popup-body">
+                            <p>📁 System Archive Files Active...</p>
+                            <div class="line"></div>
+                            <div class="archive-gallery">
+                                <a><img src="https://file.garden/ai5LuPrOLRCONCXy/GALLERY/two.jpg" alt="archive photo"></a>
+                                <a><img src="https://file.garden/ai5LuPrOLRCONCXy/GALLERY/twelve.jpg" alt="archive photo"></a>
+                                <a><img src="https://file.garden/ai5LuPrOLRCONCXy/GALLERY/thriteen.jpg" alt="archive photo"></a>
+                                <a><img src="https://file.garden/ai5LuPrOLRCONCXy/GALLERY/three.jpg" alt="archive photo"></a>
+                                <a><img src="https://file.garden/ai5LuPrOLRCONCXy/GALLERY/ten.jpg" alt="archive photo"></a>
+                                <a><img src="https://file.garden/ai5LuPrOLRCONCXy/GALLERY/six.jpg" alt="archive photo"></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="terminal-card">
+                        <div class="terminal-header">sys_profile.txt <div class="dots"><span>_</span><span>▢</span><span>×</span></div></div>
+                        <div class="terminal-body">
+                            <div class="profile-card">
+                                <img class="profile-icon" src="https://file.garden/ai5LuPrOLRCONCXy/PROFILES/930727293c0bcbb9fcd9f95619d45ba1.jpg" alt="Caelum profile icon">
+                                <blockquote class="profile-copy">
+                                    <b>Name:</b> Caelum Nikolaj Vergara<br>
+                                    <b>Pronouns:</b> He/Him<br>
+                                    <b>Location:</b> Manila, PH<br>
+                                    Master's student in Aerospace Engineering. Part-time worker @ a hobby shop. Born May 13. Hyuka FC. Strictly in-character. Minsan nagrereply sa DMs, minsan nde.
+                                    <div class="line"></div>
+                                    <span style="font-style: italic;">"Carpe diem. Seize the day, boys."</span>
+                                </blockquote>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="twin-grid">
+                        <div class="grid-cell update-cell">
+                            <div class="cell-title">site_update.log</div>
+                            <div id="site-update-list" class="log-list site-update-list">
+                                <div class="log-entry">
+                                    <b>loading...</b>
+                                    <p>Fetching site update logs.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid-cell relations-cell">
+                            <div class="cell-title">relations.txt</div>
+                            <div id="relations-carousel" class="relation-carousel">
+                                <div class="relation-carousel-track"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="terminal-card">
+                        <div class="terminal-header">textbox_01.txt <div class="dots"><span>_</span><span>▢</span><span>×</span></div></div>
+                        <div class="terminal-body">
+                            <blockquote><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae nibh non neque feugiat tempor. Donec posuere, arcu id blandit posuere, nisl risus tincidunt justo, vitae luctus lorem sem non mi.</p></blockquote>
+                        </div>
+                    </div>
+
+                    <div class="terminal-card">
+                        <div class="terminal-header">textbox_02.txt <div class="dots"><span>_</span><span>▢</span><span>×</span></div></div>
+                        <div class="terminal-body">
+                            <blockquote><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti. Praesent sit amet lacus vitae elit faucibus luctus, sed gravida justo.</p></blockquote>
+                        </div>
+                    </div>
+
+                    <div class="terminal-card">
+                        <div class="terminal-header">textbox_03.txt <div class="dots"><span>_</span><span>▢</span><span>×</span></div></div>
+                        <div class="terminal-body">
+                            <blockquote><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur consequat, lacus a faucibus finibus, massa leo fermentum mauris, et facilisis neque ipsum at lectus.</p></blockquote>
+                        </div>
+                    </div>
+
+                    <div class="terminal-card">
+                        <div class="terminal-header">textbox_04.txt <div class="dots"><span>_</span><span>▢</span><span>×</span></div></div>
+                        <div class="terminal-body">
+                            <blockquote><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam sed risus in augue pulvinar luctus. Vivamus sed nibh at mi tempor congue.</p></blockquote>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="base-floor">
+                Copyright &copy; Caelum 2026-infinity. All operations online.
+            </div>
+        </div>
+
+        <script>
+            function updatePhilippinesTimeAndDate() {
+                const timeElement = document.getElementById('philippines-time');
+                const dateElement = document.getElementById('current-date');
+                const now = new Date();
+
+                if (timeElement) {
+                    const timeOptions = { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+                    timeElement.textContent = new Intl.DateTimeFormat('en-US', timeOptions).format(now) + " PHT";
+                }
+
+                if (dateElement) {
+                    const dateOptions = { timeZone: 'Asia/Manila', day: '2-digit', month: '2-digit', year: 'numeric' };
+                    const formattedDate = new Intl.DateTimeFormat('en-GB', dateOptions).format(now).replace(/\//g, '.');
+                    dateElement.textContent = formattedDate;
+                }
+
+                updateScheduleStrings(now);
+            }
+
+            function updateScheduleStrings(dateObj) {
+                const eatingElement = document.getElementById('current-eating');
+                const drinkingElement = document.getElementById('current-drinking');
+                if (!eatingElement || !drinkingElement) return;
+
+                const manilaString = dateObj.toLocaleTimeString('en-US', { timeZone: 'Asia/Manila', hour12: false });
+                const [hours, minutes] = manilaString.split(':').map(Number);
+                const decimalTime = hours + (minutes / 60);
+
+                let eatingValue = "midnight snack";
+                let drinkingValue = "warm milk";
+
+                if (decimalTime >= 7 && decimalTime < 11.5) {
+                    eatingValue = "breakfast";
+                    drinkingValue = "coffee";
+                } else if (decimalTime >= 11.5 && decimalTime < 13.5) {
+                    eatingValue = "lunch";
+                    drinkingValue = "iced tea";
+                } else if (decimalTime >= 13.5 && decimalTime < 17) {
+                    eatingValue = "meryenda";
+                    drinkingValue = "juice";
+                } else if (decimalTime >= 17 && decimalTime < 24) {
+                    eatingValue = "dinner";
+                    drinkingValue = "water";
+                }
+
+                eatingElement.textContent = eatingValue;
+                drinkingElement.textContent = drinkingValue;
+            }
+
+            function fetchPhilippinesWeather() {
+                const headerWeather = document.getElementById('weatherWidget');
+                const sidebarWeather = document.getElementById('current-weather');
+                if (!headerWeather && !sidebarWeather) return;
+
+                fetch('https://api.open-meteo.com/v1/forecast?latitude=14.6042&longitude=120.9822&current_weather=true')
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.current_weather) {
+                        const temp = Math.round(data.current_weather.temperature);
+                        const code = data.current_weather.weathercode;
+
+                        let emoji = "☀️";
+                        let textDesc = "sunny";
+
+                        if (code === 1 || code === 2) { emoji = "⛅"; textDesc = "partly cloudy"; }
+                        else if (code === 3) { emoji = "☁️"; textDesc = "cloudy"; }
+                        else if (code >= 45 && code <= 48) { emoji = "🌫️"; textDesc = "foggy"; }
+                        else if (code >= 51 && code <= 67) { emoji = "🌧️"; textDesc = "rainy"; }
+                        else if (code >= 71 && code <= 86) { emoji = "❄️"; textDesc = "snowy"; }
+                        else if (code >= 95) { emoji = "⛈️"; textDesc = "stormy"; }
+
+                        if (headerWeather) headerWeather.textContent = `${emoji} ${temp}°C`;
+                        if (sidebarWeather) sidebarWeather.textContent = `${textDesc}, +${temp}°C`;
+                    } else {
+                        fallbackWeather();
+                    }
+                })
+                .catch(() => { fallbackWeather(); });
+
+                function fallbackWeather() {
+                    if (headerWeather) headerWeather.textContent = "☀️ 30°C";
+                    if (sidebarWeather) sidebarWeather.textContent = "sunny, +30°C";
+                }
+            }
+
+            // -------------------------------------------------------------
+            // Random Interval Mood Status Rotator Logic Block
+            // -------------------------------------------------------------
+            const moodOptions = [
+                "bored 😴", "gaming 🎮", "studying 📖", "watching 📺",
+                "working out 🏋️", "sleeping 💤", "heading out 🚶‍➡️",
+                "shopping 🛍️", "with baby sis 🐣"
+            ];
+
+            function rotateRandomMood() {
+                const moodField = document.getElementById("dynamic-mood-field");
+                if (!moodField) return;
+                const randomIndex = Math.floor(Math.random() * moodOptions.length);
+                moodField.textContent = moodOptions[randomIndex];
+                const nextInterval = Math.floor(Math.random() * (10000 - 4000 + 1)) + 4000;
+                setTimeout(rotateRandomMood, nextInterval);
+            }
+
+            const track_list = [
+                {
+                    name: "Creep",
+                    artist: "Radiohead",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/CREEP.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Radiohead%20-%20Creep%20(SPOTISAVER).mp3"
+                },
+                {
+                    name: "Teenage Dirtbag",
+                    artist: "Wheatus",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/TEENAGE%20DIRTBAG.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Wheatus%20-%20Teenage%20Dirtbag%20(SPOTISAVER).mp3"
+                },
+                {
+                    name: "Stacy's Mom",
+                    artist: "Fountains Of Wayne",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/STACYSMOM.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Fountains%20Of%20Wayne%20-%20Stacy's%20Mom%20(SPOTISAVER).mp3"
+                },
+                {
+                    name: "I'm Just a Kid",
+                    artist: "Simple Plan",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/IMJUSTAKID.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Simple%20Plan%20-%20I'm%20Just%20a%20Kid%20(SPOTISAVER).mp3"
+                },
+                {
+                    name: "Dirty Little Secret",
+                    artist: "The All-American Rejects",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/DIRTYLITTLESECRET.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/The%20All-American%20Rejects%20-%20Dirty%20Little%20Secret%20(SPOTISAVER).mp3"
+                },
+                {
+                    name: "Scotty Doesn't Know",
+                    artist: "Lustra",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/scotty%20doesnt%20know.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Lustra%20-%20Scotty%20Doesn't%20Know%20(SPOTISAVER).mp3"
+                },
+                {
+                    name: "Sk8er Boi",
+                    artist: "Avril Lavigne",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/SK8ERBOY.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Avril%20Lavigne%20-%20Sk8er%20Boi%20(SPOTISAVER).mp3"
+                },
+                {
+                    name: "Change (In the House of Flies)",
+                    artist: "Deftones",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/CHANGE.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Deftones%20-%20Change%20(In%20the%20House%20of%20Flies)%20(SPOTISAVER).mp3"
+                },
+                {
+                    name: "Dear Maria, Count Me In",
+                    artist: "All Time Low",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/DEARMARIA.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/All Time Low - Dear Maria%2C Count Me In (SPOTISAVER).mp3"
+                },
+                {
+                    name: "Black Hole Sun",
+                    artist: "Soundgarden",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/blockhole%20sun.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Soundgarden - Black Hole Sun (SPOTISAVER).mp3"
+                },
+                {
+                    name: "Basket Case",
+                    artist: "Green Day",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/BASKETCASE%20WHEN%20I%20COME.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Green Day - Basket Case (SPOTISAVER).mp3"
+                },
+                {
+                    name: "American Idiot",
+                    artist: "Green Day",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/AMERICAN%20IDIOTAND%20SEPTEMBERENDS.png",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Green Day - American Idiot (SPOTISAVER).mp3"
+                },
+                {
+                    name: "Wake Me Up When September Ends",
+                    artist: "Green Day",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/AMERICAN%20IDIOTAND%20SEPTEMBERENDS.png",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Green Day - Wake Me up When September Ends (SPOTISAVER).mp3"
+                },
+                {
+                    name: "Good Riddance (Time of Your Life)",
+                    artist: "Green Day",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/GOOD%20RIDDANCE.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Green Day - Good Riddance (Time of Your Life) (SPOTISAVER).mp3"
+                },
+                {
+                    name: "When I Come Around",
+                    artist: "Green Day",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/BASKETCASE%20WHEN%20I%20COME.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Green Day - When I Come Around (SPOTISAVER).mp3"
+                },
+                {
+                    name: "Smells Like Teen Spirit",
+                    artist: "Nirvana",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/smells%20like%20teen%20spirit%20come%20as%20u%20are%20lithium.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Nirvana - Smells Like Teen Spirit (SPOTISAVER).mp3"
+                },
+                {
+                    name: "Come As You Are",
+                    artist: "Nirvana",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/smells%20like%20teen%20spirit%20come%20as%20u%20are%20lithium.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Nirvana - Come As You Are (SPOTISAVER).mp3"
+                },
+                {
+                    name: "Heart-Shaped Box",
+                    artist: "Nirvana",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/HEART%20SHAPED%20BOX.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Nirvana - Heart-Shaped Box (SPOTISAVER).mp3"
+                },
+                {
+                    name: "Lithium",
+                    artist: "Nirvana",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/smells%20like%20teen%20spirit%20come%20as%20u%20are%20lithium.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Nirvana - Lithium (SPOTISAVER).mp3"
+                },
+                {
+                    name: "About A Girl",
+                    artist: "Nirvana",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/ABOUT%20A%20GIRL.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Nirvana - About A Girl (SPOTISAVER).mp3"
+                },
+                {
+                    name: "Ultimate",
+                    artist: "Lindsay Lohan",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/ULTIMATE.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Lindsay Lohan - Ultimate - From Freaky Friday Soundtrack Version (SPOTISAVER).mp3"
+                },
+                {
+                    name: "Kids in America",
+                    artist: "The Muffs",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/KIDS%20IN%20AMERICA.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/The Muffs - Kids in America (SPOTISAVER).mp3"
+                },
+                {
+                    name: "Perfect Day",
+                    artist: "Hoku",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/PERFECT%20DAY.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Hoku - Perfect Day (SPOTISAVER).mp3"
+                },
+                {
+                    name: "Alright",
+                    artist: "Supergrass",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/ALRIGHT.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Alright_spotdown.org.mp3"
+                },
+                {
+                    name: "Island In The Sun",
+                    artist: "Weezer",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/ISLAND%20IN%20THE%20SUN.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Island In The Sun_spotdown.org.mp3"
+                },
+                {
+                    name: "Slide",
+                    artist: "The Goo Goo Dolls",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/SLIDE%20IRIS.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Slide_spotdown.org.mp3"
+                },
+                {
+                    name: "Iris",
+                    artist: "The Goo Goo Dolls",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/SLIDE%20IRIS.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Iris_spotdown.org.mp3"
+                },
+                {
+                    name: "Just A Girl",
+                    artist: "No Doubt",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/JUST%20A%20GIRL.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Just A Girl_spotdown.org.mp3"
+                },
+                {
+                    name: "Kimdracula",
+                    artist: "Deftones",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/kim%20drac%20meine.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Kimdracula_spotdown.org.mp3"
+                },
+                {
+                    name: "Mein",
+                    artist: "Deftones",
+                    image: "https://file.garden/ai5LuPrOLRCONCXy/SONG%20COVERS/kim%20drac%20meine.jpg",
+                    path: "https://file.garden/ai5LuPrOLRCONCXy/SONGS/Mein_spotdown.org.mp3"
+                }
+            ];
+
+            let track_index = 0;
+            let isPlaying = false;
+            let updateTimer;
+            let curr_track = document.createElement('audio');
+
+            const track_art = document.querySelector("#audio-deck .cover-art");
+            const track_name = document.querySelector("#audio-deck .title-lbl");
+            const track_artist = document.querySelector("#audio-deck .artist-lbl");
+            const playpause_btn = document.querySelector("#audio-deck .playpause-track");
+            const seek_slider = document.querySelector("#audio-deck .scrub-bar");
+            const volume_slider = document.querySelector("#audio-deck .volume_slider");
+            const curr_time = document.querySelector("#audio-deck .current-time");
+            const total_duration = document.querySelector("#audio-deck .total-duration");
+            const now_playing = document.querySelector("#audio-deck .counter");
+
+            function loadTrack(index, shouldAutoPlay = false) {
+                clearInterval(updateTimer);
+                resetValues();
+
+                curr_track.src = track_list[index].path;
+                curr_track.load();
+
+                track_art.style.backgroundImage = "url(\"" + track_list[index].image + "\")";
+                track_name.textContent = track_list[index].name;
+                track_artist.textContent = track_list[index].artist;
+                now_playing.textContent = "PLAYING " + (index + 1) + " OF " + track_list.length;
+
+                curr_track.volume = volume_slider.value / 100;
+                updateTimer = setInterval(seekUpdate, 1000);
+                curr_track.onended = nextTrack;
+
+                if (shouldAutoPlay) { playTrack(); }
+            }
+
+            function resetValues() {
+                curr_time.textContent = "00:00";
+                total_duration.textContent = "00:00";
+                seek_slider.value = 0;
+            }
+
+            function playpauseTrack() {
+                if (!isPlaying) playTrack();
+                else pauseTrack();
+            }
+
+            function playTrack() {
+                curr_track.play()
+                .then(() => {
+                    isPlaying = true;
+                    playpause_btn.innerHTML = '<i class="fa fa-pause fa-sm"></i>';
+                })
+                .catch(() => {
+                    isPlaying = false;
+                    playpause_btn.innerHTML = '<i class="fa fa-play fa-sm"></i>';
+                });
+            }
+
+            function pauseTrack() {
+                curr_track.pause();
+                isPlaying = false;
+                playpause_btn.innerHTML = '<i class="fa fa-play fa-sm"></i>';
+            }
+
+            function nextTrack() {
+                if (track_index < track_list.length - 1) track_index += 1;
+                else track_index = 0;
+                loadTrack(track_index, true);
+            }
+
+            function prevTrack() {
+                if (track_index > 0) track_index -= 1;
+                else track_index = track_list.length - 1;
+                loadTrack(track_index, true);
+            }
+
+            function seekTo() {
+                let seekto = curr_track.duration * (seek_slider.value / 100);
+                curr_track.currentTime = seekto;
+            }
+
+            function setVolume() {
+                curr_track.volume = volume_slider.value / 100;
+            }
+
+            function seekUpdate() {
+                if (!isNaN(curr_track.duration)) {
+                    seek_slider.value = curr_track.currentTime * (100 / curr_track.duration);
+
+                    let currentMinutes = Math.floor(curr_track.currentTime / 60);
+                    let currentSeconds = Math.floor(curr_track.currentTime - currentMinutes * 60);
+                    let durationMinutes = Math.floor(curr_track.duration / 60);
+                    let durationSeconds = Math.floor(curr_track.duration - durationMinutes * 60);
+
+                    if (currentSeconds < 10) { currentSeconds = "0" + currentSeconds; }
+                    if (durationSeconds < 10) { durationSeconds = "0" + durationSeconds; }
+                    if (currentMinutes < 10) { currentMinutes = "0" + currentMinutes; }
+                    if (durationMinutes < 10) { durationMinutes = "0" + durationMinutes; }
+
+                    curr_time.textContent = currentMinutes + ":" + currentSeconds;
+                    total_duration.textContent = durationMinutes + ":" + durationSeconds;
+                }
+            }
+
+            const sheetSources = {
+                caeUpdate: "https://script.google.com/macros/s/AKfycbyVgM0xYYghFVQ-yXbnxssr6FkjL1np_JBjRq6V1VLsusbqzHXccaYpoRxb7Sp13QXmeA/exec",
+                siteUpdate: "https://script.google.com/macros/s/AKfycby0bnGocNsGCRXG_kPrnBV-U8LSZIHBvc8Jtz_jQw8el13M5r39bRsPjKyX1MhxZj_XwQ/exec",
+                relations: "https://script.google.com/macros/s/AKfycbyhXGKyg-zEQO8xQVeerpje78WPaQp87L_I1GXtkGskBQIiSVvFZmS3R2s8lovEVVf6/exec",
+                visualArchive: "https://script.google.com/macros/s/AKfycbwbd5o-dPVLl86fRamK3pzoLFJuuvHTXkfKv7WZyBJR5R91HcEO9vZ6a98_emOIIPdvbg/exec"
+            };
+
+            let relationProfiles = [];
+            let topPopupZ = 2000;
+
+            function getSheetRows(data) {
+                if (Array.isArray(data)) return data;
+                if (!data || typeof data !== "object") return [];
+                if (Array.isArray(data.data)) return data.data;
+                if (Array.isArray(data.rows)) return data.rows;
+                if (Array.isArray(data.result)) return data.result;
+                return [];
+            }
+
+            function normalizeKey(value) {
+                return String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+            }
+
+            function getRowValues(row) {
+                if (Array.isArray(row)) return row;
+                if (!row || typeof row !== "object") return [];
+                return Object.keys(row).map((key) => row[key]);
+            }
+
+            function getSheetValue(row, preferredNames, fallbackIndex) {
+                if (!row || typeof row !== "object") return "";
+                const keys = Object.keys(row);
+                const normalizedNames = preferredNames.map(normalizeKey);
+                const matchedKey = keys.find((key) => normalizedNames.includes(normalizeKey(key)));
+                if (matchedKey) return String(row[matchedKey] || "").trim();
+                const rowValues = getRowValues(row);
+                return rowValues[fallbackIndex] ? String(rowValues[fallbackIndex]).trim() : "";
+            }
+
+            function parseLogDate(value) {
+                const raw = String(value || "").trim();
+                const match = raw.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2,4})(?:\s+(\d{1,2}):(\d{2}))?/);
+                if (!match) {
+                    const parsed = Date.parse(raw);
+                    return Number.isNaN(parsed) ? 0 : parsed;
+                }
+                const day = Number(match[1]);
+                const month = Number(match[2]) - 1;
+                const year = Number(match[3].length === 2 ? "20" + match[3] : match[3]);
+                const hour = Number(match[4] || 0);
+                const minute = Number(match[5] || 0);
+                return new Date(year, month, day, hour, minute).getTime();
+            }
+
+            async function fetchSheetRows(url) {
+                const separator = url.includes("?") ? "&" : "?";
+                const response = await fetch(url + separator + "_=" + Date.now(), { cache: "no-store" });
+                if (!response.ok) throw new Error("Sheet request failed");
+                const data = await response.json();
+                return getSheetRows(data);
+            }
+
+            function renderLogList(targetId, rows) {
+                const target = document.getElementById(targetId);
+                if (!target) return;
+
+                target.innerHTML = "";
+                const logs = rows
+                    .map((row, index) => ({
+                        date: getSheetValue(row, ["date"], 0),
+                        content: getSheetValue(row, ["content", "contents", "entry", "log"], 1),
+                        order: index
+                    }))
+                    .filter((log) => log.date || log.content)
+                    .sort((a, b) => (parseLogDate(b.date) - parseLogDate(a.date)) || (a.order - b.order))
+                    .slice(0, 5);
+
+                if (!logs.length) {
+                    logs.push({ date: "--.--.----", content: "No logs found.", order: 0 });
+                }
+
+                logs.forEach((log, index) => {
+                    const entry = document.createElement("div");
+                    entry.className = "log-entry";
+
+                    const date = document.createElement("u");
+                    date.textContent = log.date || "--.--.----";
+                    entry.appendChild(date);
+                    entry.appendChild(document.createElement("br"));
+
+                    const copy = document.createElement("p");
+                    copy.textContent = log.content || "No entry provided.";
+                    entry.appendChild(copy);
+                    target.appendChild(entry);
+
+                    if (index < logs.length - 1) {
+                        const divider = document.createElement("div");
+                        divider.className = "line";
+                        target.appendChild(divider);
+                    }
+                });
+            }
+
+            function normalizeRelations(rows) {
+                return rows
+                    .map((row) => {
+                        const values = getRowValues(row).map((value) => String(value || "").trim());
+                        return {
+                            profile: values[0] || getSheetValue(row, ["profile", "image", "img", "photo", "url", "column1"], 0),
+                            name: values[1] || getSheetValue(row, ["name", "title", "column2"], 1),
+                            description: values[2] || getSheetValue(row, ["description", "desc", "content", "contents", "column3"], 2)
+                        };
+                    })
+                    .filter((entry) => entry.profile || entry.name || entry.description);
+            }
+
+            function renderRelationCarousel(entries) {
+                relationProfiles = entries;
+                const carousel = document.getElementById("relations-carousel");
+                if (!carousel) return;
+
+                carousel.innerHTML = "";
+                if (!entries.length) return;
+
+                const track = document.createElement("div");
+                track.className = "relation-carousel-track";
+
+                entries.concat(entries).forEach((entry, index) => {
+                    const relationIndex = index % entries.length;
+                    const isDuplicate = index >= entries.length;
+                    const button = document.createElement("button");
+                    button.className = "relation-carousel-button";
+                    button.type = "button";
+                    button.setAttribute("aria-label", "Open " + (entry.name || "relation profile"));
+                    button.addEventListener("click", () => openRelationsPopup(relationIndex));
+
+                    if (isDuplicate) {
+                        button.tabIndex = -1;
+                        button.setAttribute("aria-hidden", "true");
+                    }
+
+                    if (entry.profile) {
+                        const img = document.createElement("img");
+                        img.src = entry.profile;
+                        img.alt = isDuplicate ? "" : (entry.name || "relation profile");
+                        button.appendChild(img);
+                    } else {
+                        const blank = document.createElement("span");
+                        blank.className = "blank-profile";
+                        button.appendChild(blank);
+                    }
+
+                    track.appendChild(button);
+                });
+
+                carousel.appendChild(track);
+                if (entries.length <= 1) track.style.animation = "none";
+            }
+
+            async function loadDynamicContent() {
+                fetchSheetRows(sheetSources.siteUpdate)
+                    .then((rows) => renderLogList("site-update-list", rows))
+                    .catch(() => renderLogList("site-update-list", []));
+
+                fetchSheetRows(sheetSources.relations)
+                    .then((rows) => renderRelationCarousel(normalizeRelations(rows)))
+                    .catch(() => renderRelationCarousel([]));
+            }
+
+            // Draggable Popup Interface Management Engine Logic
+            function bringPopupToFront(popup) {
+                if (!popup) return;
+                topPopupZ += 1;
+                popup.style.zIndex = topPopupZ;
+            }
+
+            function closePopupById(id) {
+                const popup = document.getElementById(id);
+                if (popup) { popup.style.display = "none"; }
+            }
+
+            function openRelationsPopup(index = 0) {
+                const i = Number.isFinite(Number(index)) ? Number(index) : 0;
+                const relation = relationProfiles[i];
+                if (!relation) return;
+
+                const popupId = "relations-popup-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
+                const popup = document.createElement("div");
+                popup.id = popupId;
+                popup.className = "popup-window";
+                popup.style.width = "330px";
+                popup.style.height = "260px";
+
+                const hasImage = !!relation.profile;
+                popup.innerHTML =
+                    '<div class="popup-header" id="' + popupId + '-header-drag">' +
+                        '<span>relations.exe</span>' +
+                        '<div class="popup-dots"><button class="popup-close" type="button" aria-label="Close relations popup">\xd7</button></div>' +
+                    '</div>' +
+                    '<div class="popup-body" style="overflow-x:hidden;">' +
+                        '<div class="relation-detail">' +
+                            (hasImage
+                                ? '<img class="relation-icon" src="' + relation.profile + '" alt="' + (relation.name || "relation profile") + '">'
+                                : '') +
+                            '<div class="relation-detail-copy">' +
+                                '<span class="relation-title">' + (relation.name || "") + '</span>' +
+                                '<p>' + (relation.description || "") + '</p>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+
+                popup.querySelector(".popup-close").addEventListener("click", () => popup.remove());
+                document.body.appendChild(popup);
+                popup.style.top = "50%";
+                popup.style.left = "50%";
+                popup.style.transform = "translate(-50%, -50%)";
+                popup.style.display = "block";
+                bringPopupToFront(popup);
+                dragElement(popup);
+            }
+
+            function openArchivePopup() {
+                const popup = document.getElementById("archive-popup");
+                popup.style.top = "50%";
+                popup.style.left = "50%";
+                popup.style.transform = "translate(-50%, -50%)";
+                popup.style.display = "block";
+                bringPopupToFront(popup);
+            }
+
+            function dragElement(elmnt) {
+                if (!elmnt) return;
+
+                let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+                const header = document.getElementById(elmnt.id + "-header-drag");
+
+                elmnt.addEventListener("pointerdown", () => bringPopupToFront(elmnt));
+
+                if (header) {
+                    header.addEventListener("pointerdown", dragMouseDown);
+                } else {
+                    elmnt.addEventListener("pointerdown", dragMouseDown);
+                }
+
+                function dragMouseDown(e) {
+                    e = e || window.event;
+                    if (e.target.closest && e.target.closest(".popup-close")) return;
+
+                    e.preventDefault();
+                    bringPopupToFront(elmnt);
+                    const rect = elmnt.getBoundingClientRect();
+                    elmnt.style.transform = "none";
+                    elmnt.style.top = rect.top + "px";
+                    elmnt.style.left = rect.left + "px";
+
+                    pos3 = e.clientX;
+                    pos4 = e.clientY;
+                    document.addEventListener("pointerup", closeDragElement);
+                    document.addEventListener("pointercancel", closeDragElement);
+                    document.addEventListener("pointermove", elementDrag);
+                }
+
+                function elementDrag(e) {
+                    e = e || window.event;
+                    e.preventDefault();
+                    pos1 = pos3 - e.clientX;
+                    pos2 = pos4 - e.clientY;
+                    pos3 = e.clientX;
+                    pos4 = e.clientY;
+                    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+                }
+
+                function closeDragElement() {
+                    document.removeEventListener("pointerup", closeDragElement);
+                    document.removeEventListener("pointercancel", closeDragElement);
+                    document.removeEventListener("pointermove", elementDrag);
+                }
+            }
+
+            function bindPopupCloseButtons() {
+                document.querySelectorAll("[data-close-popup]").forEach((button) => {
+                    const closeTarget = () => closePopupById(button.dataset.closePopup);
+
+                    button.addEventListener("pointerdown", (event) => {
+                        event.stopPropagation();
+                    });
+
+                    button.addEventListener("touchstart", (event) => {
+                        event.stopPropagation();
+                    }, { passive: true });
+
+                    button.addEventListener("touchend", (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        closeTarget();
+                    }, { passive: false });
+
+                    button.addEventListener("click", (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        closeTarget();
+                    });
+                });
+            }
+
+            function bindReadMoreToggles() {
+                document.querySelectorAll("[data-read-more-target]").forEach((toggle) => {
+                    const copy = document.getElementById(toggle.dataset.readMoreTarget);
+                    if (!copy) return;
+
+                    toggle.addEventListener("click", () => {
+                        const isExpanded = copy.classList.toggle("is-expanded");
+                        toggle.setAttribute("aria-expanded", String(isExpanded));
+                        toggle.innerHTML = isExpanded ? "Read Less &laquo;" : "Read More &raquo;";
+                    });
+                });
+            }
+
+            dragElement(document.getElementById("archive-popup"));
+            dragElement(document.getElementById("calendar-popup"));
+
+            // Google Calendar API
+            const gcalApiKey = "AIzaSyArJFBiBtSAh-k_xUByTLmfiZURYu91nrw";
+            const gcalIds = [
+                "1d44b7ff695370a1e5e83f9348537da89b88ef36897c0ec21a7cbaa85c0b905d@group.calendar.google.com",
+                "24515d2ce54ba523308a73a469cb1409ba901640aca5f491956154450e42b491@group.calendar.google.com",
+                "en.philippines#holiday@group.v.calendar.google.com",
+                "75944e185f8b976dbfa1fe0ee35c9afa1cb19295589ddffaccf8bf43b62b5a05@group.calendar.google.com"
+            ];
+
+            let calendarViewMonth = new Date().getMonth();
+            let calendarViewYear  = new Date().getFullYear();
+            let calendarEventMap  = {};
+
+            function openCalendarPopup() {
+                calendarViewMonth = new Date().getMonth();
+                calendarViewYear  = new Date().getFullYear();
+                const popup = document.getElementById("calendar-popup");
+                popup.style.top = "50%";
+                popup.style.left = "50%";
+                popup.style.transform = "translate(-50%, -50%)";
+                popup.style.display = "block";
+                bringPopupToFront(popup);
+                fetchCalendarEventsForMonth(calendarViewYear, calendarViewMonth).then(renderCalendar);
+            }
+
+            function closeCalendarPopup() {
+                closePopupById("calendar-popup");
+            }
+
+            function calendarNav(delta) {
+                calendarViewMonth += delta;
+                if (calendarViewMonth > 11) { calendarViewMonth = 0; calendarViewYear++; }
+                if (calendarViewMonth < 0)  { calendarViewMonth = 11; calendarViewYear--; }
+                renderCalendar();
+                fetchCalendarEventsForMonth(calendarViewYear, calendarViewMonth).then(renderCalendar);
+            }
+
+            function fetchCalendarEventsForMonth(year, month) {
+                const timeMin = encodeURIComponent(new Date(year, month, 1).toISOString());
+                const timeMax = encodeURIComponent(new Date(year, month + 1, 0, 23, 59, 59).toISOString());
+                const calendarColors = [
+                    "#c0392b",  // F1 — red
+                    "#2980b9",  // F2 — blue
+                    "#8e44ad",  // PH holidays — purple
+                    "#d4a017"   // new calendar — amber/gold
+                ];
+
+                const fetches = gcalIds.map((id, i) =>
+                    fetch(
+                        "https://www.googleapis.com/calendar/v3/calendars/" +
+                        encodeURIComponent(id) +
+                        "/events?key=" + gcalApiKey +
+                        "&timeMin=" + timeMin +
+                        "&timeMax=" + timeMax +
+                        "&maxResults=50&singleEvents=true&orderBy=startTime"
+                    )
+                    .then(r => r.ok ? r.json() : null)
+                    .then(data => {
+                        if (!data || !data.items) return [];
+                        return data.items.map(ev => ({
+                            name: ev.summary || "Event",
+                            date: (ev.start.dateTime || ev.start.date).slice(0, 10),
+                            color: calendarColors[i]
+                        }));
+                    })
+                    .catch(() => [])
+                );
+
+                return Promise.all(fetches).then(results => {
+                    calendarEventMap = {};
+                    results.flat().forEach(ev => {
+                        if (!calendarEventMap[ev.date]) calendarEventMap[ev.date] = [];
+                        calendarEventMap[ev.date].push({ name: ev.name, color: ev.color });
+                    });
+                });
+            }
+
+            function renderCalendar() {
+                const today = new Date();
+                const todayDate  = today.getDate();
+                const todayMonth = today.getMonth();
+                const todayYear  = today.getFullYear();
+
+                const month = calendarViewMonth;
+                const year  = calendarViewYear;
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const firstDay    = new Date(year, month, 1).getDay();
+                const monthNames  = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+                const isCurrentMonth = (month === todayMonth && year === todayYear);
+
+                let html = `<table style="width:100%;border-collapse:collapse;color:var(--text-main);font-family:monospace;font-size:11px;">
+                    <tr>
+                        <td style="text-align:left;padding-bottom:6px;">
+                            <button onclick="calendarNav(-1)" style="appearance:none;background:transparent;border:1px solid var(--border-color);color:var(--text-accent);font-family:monospace;font-size:10px;cursor:pointer;padding:1px 5px;">&lt;</button>
+                        </td>
+                        <td colspan="5" style="text-align:center;color:var(--text-heading);padding-bottom:6px;"><strong>${monthNames[month]} ${year}</strong></td>
+                        <td style="text-align:right;padding-bottom:6px;">
+                            <button onclick="calendarNav(1)" style="appearance:none;background:transparent;border:1px solid var(--border-color);color:var(--text-accent);font-family:monospace;font-size:10px;cursor:pointer;padding:1px 5px;">&gt;</button>
+                        </td>
+                    </tr>
+                    <tr style="color:var(--text-accent);">
+                        <td style="padding:4px 3px;text-align:center;">Su</td>
+                        <td style="padding:4px 3px;text-align:center;">M</td>
+                        <td style="padding:4px 3px;text-align:center;">Tu</td>
+                        <td style="padding:4px 3px;text-align:center;">W</td>
+                        <td style="padding:4px 3px;text-align:center;">Th</td>
+                        <td style="padding:4px 3px;text-align:center;">F</td>
+                        <td style="padding:4px 3px;text-align:center;">Sa</td>
+                    </tr><tr>`;
+
+                for (let i = 0; i < firstDay; i++) {
+                    html += `<td style="padding:4px 3px;"></td>`;
+                }
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const isToday = isCurrentMonth && day === todayDate;
+                    const dateKey = year + "-" + String(month + 1).padStart(2, "0") + "-" + String(day).padStart(2, "0");
+                    const events  = calendarEventMap[dateKey] || [];
+
+                    let cellStyle = "text-align:center;padding:4px 3px;border-radius:3px;cursor:" + (events.length ? "pointer" : "default") + ";";
+                    if (isToday) {
+                        cellStyle += "background:var(--text-accent);color:#0b0f17;font-weight:bold;";
+                    }
+                    if (events.length) {
+                        const uniqueColors = [...new Set(events.map(e => e.color))];
+                        cellStyle += "border-bottom:3px solid " + uniqueColors[0] + ";";
+                    }
+
+                    const eventsAttr = events.length
+                        ? ` data-cal-events="${events.map(e => e.color + "|" + e.name.replace(/"/g,"&quot;")).join(";;")}" data-cal-label="${monthNames[month]} ${day}"`
+                        : "";
+
+                    html += `<td style="${cellStyle}"${eventsAttr} onclick="handleCalendarCellClick(this)">${day}</td>`;
+
+                    if ((day + firstDay) % 7 === 0 && day < daysInMonth) html += "</tr><tr>";
+                }
+                html += "</tr></table>";
+
+                // Upcoming events list — compact
+                const allEvents = Object.entries(calendarEventMap)
+                    .filter(([k]) => k.startsWith(year + "-" + String(month + 1).padStart(2, "0")))
+                    .flatMap(([k, evs]) => evs.map(e => ({ date: k, name: e.name, color: e.color })))
+                    .sort((a, b) => a.date.localeCompare(b.date));
+
+                const today8 = todayYear + "-" + String(todayMonth + 1).padStart(2, "0") + "-" + String(todayDate).padStart(2, "0");
+                const upcoming = isCurrentMonth ? allEvents.filter(e => e.date >= today8) : allEvents;
+
+                let upcomingHtml =
+                    `<div style="margin-top:8px;border-top:1px dashed var(--border-color);padding-top:5px;font-family:monospace;">` +
+                    `<span style="font-size:8px;font-weight:bold;text-transform:uppercase;color:var(--text-accent);letter-spacing:1px;">upcoming</span> `;
+
+                if (!upcoming.length) {
+                    upcomingHtml += `<span style="font-size:8px;color:var(--text-main);opacity:.5;">none this month</span>`;
+                } else {
+                    upcoming.slice(0, 3).forEach(ev => {
+                        const d = new Date(ev.date + "T00:00:00");
+                        const label = (d.getMonth() + 1) + "/" + d.getDate();
+                        upcomingHtml +=
+                            `<span style="display:inline-flex;align-items:center;gap:3px;margin-right:8px;font-size:8px;color:var(--text-main);">` +
+                            `<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:${ev.color};flex-shrink:0;"></span>` +
+                            `<span style="color:var(--text-heading);">${label}</span> ${ev.name}</span>`;
+                    });
+                    if (upcoming.length > 3) {
+                        upcomingHtml += `<span style="font-size:8px;color:var(--text-main);opacity:.5;">+${upcoming.length - 3} more</span>`;
+                    }
+                }
+                upcomingHtml += `</div>`;
+
+                document.getElementById("calendar-content").innerHTML = html + upcomingHtml;
+            }
+
+            function handleCalendarCellClick(cell) {
+                const raw   = cell.getAttribute("data-cal-events");
+                const label = cell.getAttribute("data-cal-label");
+                if (!raw) return;
+
+                const existing = document.getElementById("cal-cell-popover");
+                if (existing) existing.remove();
+
+                const events = raw.split(";;").map(s => {
+                    const idx = s.indexOf("|");
+                    return { color: s.slice(0, idx), name: s.slice(idx + 1) };
+                });
+
+                const pop = document.createElement("div");
+                pop.id = "cal-cell-popover";
+                pop.style.cssText =
+                    "position:fixed;z-index:9999;background:var(--bg-box);border:1px solid var(--border-color);" +
+                    "box-shadow:0 6px 24px rgba(0,0,0,0.7);border-radius:4px;padding:10px 12px;" +
+                    "font-family:monospace;font-size:10px;min-width:160px;max-width:240px;color:var(--text-main);";
+
+                let inner =
+                    `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">` +
+                    `<span style="color:var(--text-heading);font-weight:bold;font-size:11px;">${label}</span>` +
+                    `<span onclick="document.getElementById('cal-cell-popover').remove()" ` +
+                    `style="cursor:pointer;color:var(--text-accent);font-size:13px;line-height:1;margin-left:10px;">&times;</span>` +
+                    `</div>`;
+                events.forEach(ev => {
+                    inner +=
+                        `<div style="display:flex;align-items:flex-start;gap:7px;margin-bottom:5px;">` +
+                        `<span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${ev.color};flex-shrink:0;margin-top:2px;"></span>` +
+                        `<span style="line-height:1.4;">${ev.name}</span>` +
+                        `</div>`;
+                });
+                pop.innerHTML = inner;
+                document.body.appendChild(pop);
+
+                const rect = cell.getBoundingClientRect();
+                const pw = 240, ph = 80;
+                let top  = rect.bottom + 6;
+                let left = rect.left;
+                if (left + pw > window.innerWidth - 8)  left = window.innerWidth - pw - 8;
+                if (top  + ph > window.innerHeight - 8) top  = rect.top - ph - 6;
+                pop.style.top  = Math.max(8, top)  + "px";
+                pop.style.left = Math.max(8, left) + "px";
+
+                setTimeout(() => {
+                    function dismiss(e) {
+                        if (!pop.contains(e.target)) {
+                            pop.remove();
+                            document.removeEventListener("pointerdown", dismiss);
+                        }
+                    }
+                    document.addEventListener("pointerdown", dismiss);
+                }, 0);
+            }
+
+            // Show today's date in the sidebar card + upcoming event countdown
+            (function() {
+                const el = document.getElementById("calendar-today-display");
+                if (!el) return;
+                const now = new Date();
+                const dayNames   = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+                const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+                el.innerHTML =
+                    "<span style='font-size:15px;font-weight:bold;color:var(--text-heading);'>" +
+                        monthNames[now.getMonth()] + " " + now.getDate() + ", " + now.getFullYear() +
+                    "</span><br>" +
+                    "<span style='font-size:11px;color:var(--text-main);'>" + dayNames[now.getDay()] + "</span>" +
+                    "<div id='calendar-countdown' style='margin-top:6px;font-size:9px;font-family:monospace;color:var(--text-accent);min-height:14px;'>loading events...</div>";
+
+                fetchNextCalendarEvent();
+            })();
+
+            function fetchNextCalendarEvent() {
+                const countdownEl = document.getElementById("calendar-countdown");
+                if (!countdownEl) return;
+
+                const now = new Date();
+                const timeMin = encodeURIComponent(now.toISOString());
+
+                const fetches = gcalIds.map(id =>
+                    fetch(
+                        "https://www.googleapis.com/calendar/v3/calendars/" +
+                        encodeURIComponent(id) +
+                        "/events?key=" + gcalApiKey +
+                        "&timeMin=" + timeMin +
+                        "&maxResults=1&singleEvents=true&orderBy=startTime"
+                    )
+                    .then(r => r.ok ? r.json() : null)
+                    .then(data => {
+                        if (!data || !data.items || !data.items.length) return null;
+                        const ev = data.items[0];
+                        const start = ev.start.dateTime ? new Date(ev.start.dateTime) : new Date(ev.start.date);
+                        return { name: ev.summary, start };
+                    })
+                    .catch(() => null)
+                );
+
+                Promise.all(fetches).then(results => {
+                    if (!countdownEl) return;
+                    const valid = results
+                        .filter(e => e && e.start > now)
+                        .sort((a, b) => a.start - b.start);
+
+                    if (!valid.length) {
+                        countdownEl.textContent = "no upcoming events";
+                        return;
+                    }
+
+                    const next = valid[0];
+                    function tick() {
+                        const diff = next.start - new Date();
+                        if (diff <= 0) {
+                            countdownEl.textContent = next.name + " — now";
+                            return;
+                        }
+                        const d = Math.floor(diff / 86400000);
+                        const h = Math.floor((diff % 86400000) / 3600000);
+                        const m = Math.floor((diff % 3600000) / 60000);
+                        const s = Math.floor((diff % 60000) / 1000);
+                        const parts = [];
+                        if (d) parts.push(d + "d");
+                        if (h) parts.push(h + "h");
+                        if (m) parts.push(m + "m");
+                        parts.push(String(s).padStart(2, "0") + "s");
+                        countdownEl.innerHTML =
+                            "<span style='color:var(--text-main);'>\u25b6 " + next.name + "</span><br>" +
+                            parts.join(" ");
+                        setTimeout(tick, 1000);
+                    }
+                    tick();
+                });
+            }
+
+            updatePhilippinesTimeAndDate();
+            setInterval(updatePhilippinesTimeAndDate, 1000);
+            fetchPhilippinesWeather();
+            setInterval(fetchPhilippinesWeather, 600000);
+            loadDynamicContent();
+            setInterval(loadDynamicContent, 300000);
+            bindReadMoreToggles();
+            bindPopupCloseButtons();
+            rotateRandomMood();
+            loadTrack(track_index, true);
+
+        </script>
+    </body>
+</html>
