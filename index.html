@@ -2145,16 +2145,8 @@
 
                 const isCurrentMonth = (month === todayMonth && year === todayYear);
 
-                // Legend
-                const legend =
-                    `<div style="display:flex;gap:10px;font-family:monospace;font-size:9px;color:var(--text-main);margin-bottom:6px;flex-wrap:wrap;">` +
-                    `<span><span style="display:inline-block;width:8px;height:8px;background:#c0392b;border-radius:2px;margin-right:3px;"></span>Formula 1</span>` +
-                    `<span><span style="display:inline-block;width:8px;height:8px;background:#2980b9;border-radius:2px;margin-right:3px;"></span>Formula 2</span>` +
-                    `<span><span style="display:inline-block;width:8px;height:8px;background:#8e44ad;border-radius:2px;margin-right:3px;"></span>PH Holiday</span>` +
-                    `<span><span style="display:inline-block;width:8px;height:8px;background:var(--text-accent);border-radius:2px;margin-right:3px;"></span>Today</span>` +
-                    `</div>`;
-
-                let html = legend + `<table style="width:100%;border-collapse:collapse;color:var(--text-main);font-family:monospace;font-size:11px;">
+                // Legend removed — events shown via click notification and upcoming list below
+                let html = `<table style="width:100%;border-collapse:collapse;color:var(--text-main);font-family:monospace;font-size:11px;">
                     <tr>
                         <td style="text-align:left;padding-bottom:6px;">
                             <button onclick="calendarNav(-1)" style="appearance:none;background:transparent;border:1px solid var(--border-color);color:var(--text-accent);font-family:monospace;font-size:10px;cursor:pointer;padding:1px 5px;">&lt;</button>
@@ -2181,37 +2173,82 @@
                     const isToday = isCurrentMonth && day === todayDate;
                     const dateKey = year + "-" + String(month + 1).padStart(2, "0") + "-" + String(day).padStart(2, "0");
                     const events  = calendarEventMap[dateKey] || [];
-                    const title   = events.length ? events.map(e => e.name).join(", ") : "";
 
-                    // Pick the dominant bg color: today overrides, otherwise first event's color
-                    let bg = "", fg = "inherit", border = "";
+                    // Today gets accent bg. Events get subtle colored bottom border only.
+                    let cellStyle = "text-align:center;padding:4px 3px;border-radius:3px;cursor:" + (events.length ? "pointer" : "default") + ";";
                     if (isToday) {
-                        bg = "var(--text-accent)";
-                        fg = "#0b0f17";
-                        // If also has events, show a colored left border
-                        if (events.length) border = "border-left:3px solid " + events[0].color + ";";
-                    } else if (events.length) {
-                        // Multiple calendars on same day: blend by showing first color as bg (semi-transparent)
-                        bg = events[0].color;
-                        fg = "#fff";
-                        // Additional calendars shown as right border
-                        if (events.length > 1) border = "border-right:3px solid " + events[events.length - 1].color + ";";
+                        cellStyle += "background:var(--text-accent);color:#0b0f17;font-weight:bold;";
+                    }
+                    if (events.length) {
+                        const uniqueColors = [...new Set(events.map(e => e.color))];
+                        cellStyle += "border-bottom:3px solid " + uniqueColors[0] + ";";
                     }
 
-                    const cellStyle =
-                        "text-align:center;padding:4px 3px;" +
-                        (bg ? "background:" + bg + ";" : "") +
-                        (fg !== "inherit" ? "color:" + fg + ";" : "") +
-                        (isToday ? "font-weight:bold;" : "") +
-                        "border-radius:3px;" +
-                        border;
+                    // Encode events as a data attribute to avoid inline JSON quoting issues
+                    const eventsAttr = events.length
+                        ? ` data-cal-events="${events.map(e => e.color + "|" + e.name.replace(/"/g,"&quot;")).join(";;")}" data-cal-label="${monthNames[month]} ${day}"`
+                        : "";
 
-                    html += `<td style="${cellStyle}"${title ? ` title="${title.replace(/"/g, "&quot;")}"` : ""}>${day}</td>`;
+                    html += `<td style="${cellStyle}"${eventsAttr} onclick="handleCalendarCellClick(this)">${day}</td>`;
 
                     if ((day + firstDay) % 7 === 0 && day < daysInMonth) html += "</tr><tr>";
                 }
                 html += "</tr></table>";
-                document.getElementById("calendar-content").innerHTML = html;
+
+                // Upcoming events list
+                const allEvents = Object.entries(calendarEventMap)
+                    .filter(([k]) => k.startsWith(year + "-" + String(month + 1).padStart(2, "0")))
+                    .flatMap(([k, evs]) => evs.map(e => ({ date: k, name: e.name, color: e.color })))
+                    .sort((a, b) => a.date.localeCompare(b.date));
+
+                const today8 = todayYear + "-" + String(todayMonth + 1).padStart(2, "0") + "-" + String(todayDate).padStart(2, "0");
+                const upcoming = isCurrentMonth ? allEvents.filter(e => e.date >= today8) : allEvents;
+
+                let upcomingHtml =
+                    `<div style="margin-top:10px;border-top:1px dashed var(--border-color);padding-top:6px;">` +
+                    `<div style="font-family:monospace;font-size:9px;font-weight:bold;text-transform:uppercase;color:var(--text-accent);margin-bottom:5px;letter-spacing:1px;">upcoming events</div>`;
+
+                if (!upcoming.length) {
+                    upcomingHtml += `<div style="font-family:monospace;font-size:9px;color:var(--text-main);opacity:0.6;">no events this month</div>`;
+                } else {
+                    upcoming.slice(0, 6).forEach(ev => {
+                        const d = new Date(ev.date + "T00:00:00");
+                        const label = monthNames[d.getMonth()] + " " + d.getDate();
+                        upcomingHtml +=
+                            `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">` +
+                            `<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${ev.color};flex-shrink:0;"></span>` +
+                            `<span style="font-family:monospace;font-size:9px;color:var(--text-main);"><span style="color:var(--text-heading);">${label}</span> — ${ev.name}</span>` +
+                            `</div>`;
+                    });
+                    if (upcoming.length > 6) {
+                        upcomingHtml += `<div style="font-family:monospace;font-size:9px;color:var(--text-main);opacity:0.5;">+${upcoming.length - 6} more</div>`;
+                    }
+                }
+                upcomingHtml += `</div>`;
+
+                // Tap/click notification area
+                const noteHtml = `<div id="cal-event-note" style="display:none;margin-top:8px;padding:6px 8px;background:var(--bg-main);border:1px solid var(--border-color);border-radius:3px;font-family:monospace;font-size:9px;color:var(--text-main);line-height:1.6;"></div>`;
+
+                document.getElementById("calendar-content").innerHTML = html + upcomingHtml + noteHtml;
+            }
+
+            function handleCalendarCellClick(cell) {
+                const raw   = cell.getAttribute("data-cal-events");
+                const label = cell.getAttribute("data-cal-label");
+                const note  = document.getElementById("cal-event-note");
+                if (!note || !raw) return;
+                const events = raw.split(";;").map(s => {
+                    const idx = s.indexOf("|");
+                    return { color: s.slice(0, idx), name: s.slice(idx + 1) };
+                });
+                let inner = `<span style="color:var(--text-heading);font-weight:bold;">${label}</span><br>`;
+                events.forEach(ev => {
+                    inner +=
+                        `<span style="display:inline-block;width:6px;height:6px;border-radius:50%;` +
+                        `background:${ev.color};margin-right:5px;vertical-align:middle;"></span>${ev.name}<br>`;
+                });
+                note.innerHTML = inner;
+                note.style.display = "block";
             }
 
             // Google Calendar API — fetch next upcoming event across all calendars
