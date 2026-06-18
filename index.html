@@ -2136,6 +2136,14 @@
                 document.getElementById("calendar-content").innerHTML = html;
             }
 
+            // Google Calendar API — fetch next upcoming event across all calendars
+            const gcalApiKey = "AIzaSyArJFBiBtSAh-k_xUByTLmfiZURYu91nrw";
+            const gcalIds = [
+                "1d44b7ff695370a1e5e83f9348537da89b88ef36897c0ec21a7cbaa85c0b905d@group.calendar.google.com",
+                "24515d2ce54ba523308a73a469cb1409ba901640aca5f491956154450e42b491@group.calendar.google.com",
+                "en.philippines#holiday@group.v.calendar.google.com"
+            ];
+
             // Show today's date in the sidebar card + upcoming event countdown
             (function() {
                 const el = document.getElementById("calendar-today-display");
@@ -2154,14 +2162,6 @@
 
                 fetchNextCalendarEvent();
             })();
-
-            // Google Calendar API — fetch next upcoming event across all calendars
-            const gcalApiKey = "AIzaSyArJFBiBtSAh-k_xUByTLmfiZURYu91nrw";
-            const gcalIds = [
-                "1d44b7ff695370a1e5e83f9348537da89b88ef36897c0ec21a7cbaa85c0b905d@group.calendar.google.com",
-                "24515d2ce54ba523308a73a469cb1409ba901640aca5f491956154450e42b491@group.calendar.google.com",
-                "en.philippines#holiday@group.v.calendar.google.com"
-            ];
 
             function fetchNextCalendarEvent() {
                 const countdownEl = document.getElementById("calendar-countdown");
