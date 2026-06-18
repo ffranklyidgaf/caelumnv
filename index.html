@@ -1064,7 +1064,7 @@
                             <div class="profile-card">
                                 <img class="profile-icon" src="https://file.garden/ai5LuPrOLRCONCXy/PROFILES/930727293c0bcbb9fcd9f95619d45ba1.jpg" alt="Caelum profile icon">
                                 <blockquote class="profile-copy">
-                                    <b>Name:</b> Caelum Vergara<br>
+                                    <b>Name:</b> Caelum Nikolaj Vergara<br>
                                     <b>Pronouns:</b> He/Him<br>
                                     <b>Location:</b> Manila, PH<br>
                                     Master’s student in Aerospace Engineering. Part-time worker @ a hobby shop. Born May 13. Hyuka FC. Strictly in-character. Minsan nagrereply sa DMs, minsan nde.
@@ -2094,7 +2094,14 @@
                 const timeMin = encodeURIComponent(new Date(year, month, 1).toISOString());
                 const timeMax = encodeURIComponent(new Date(year, month + 1, 0, 23, 59, 59).toISOString());
 
-                const fetches = gcalIds.map(id =>
+                // Each calendar has its own color
+                const calendarColors = [
+                    "#c0392b",  // F1 — red
+                    "#2980b9",  // F2 — blue
+                    "#8e44ad"   // PH holidays — purple
+                ];
+
+                const fetches = gcalIds.map((id, i) =>
                     fetch(
                         "https://www.googleapis.com/calendar/v3/calendars/" +
                         encodeURIComponent(id) +
@@ -2108,7 +2115,8 @@
                         if (!data || !data.items) return [];
                         return data.items.map(ev => ({
                             name: ev.summary || "Event",
-                            date: (ev.start.dateTime || ev.start.date).slice(0, 10)
+                            date: (ev.start.dateTime || ev.start.date).slice(0, 10),
+                            color: calendarColors[i]
                         }));
                     })
                     .catch(() => [])
@@ -2118,7 +2126,7 @@
                     calendarEventMap = {};
                     results.flat().forEach(ev => {
                         if (!calendarEventMap[ev.date]) calendarEventMap[ev.date] = [];
-                        calendarEventMap[ev.date].push(ev.name);
+                        calendarEventMap[ev.date].push({ name: ev.name, color: ev.color });
                     });
                 });
             }
@@ -2137,7 +2145,16 @@
 
                 const isCurrentMonth = (month === todayMonth && year === todayYear);
 
-                let html = `<table style="width:100%;border-collapse:collapse;color:var(--text-main);font-family:monospace;font-size:11px;">
+                // Legend
+                const legend =
+                    `<div style="display:flex;gap:10px;font-family:monospace;font-size:9px;color:var(--text-main);margin-bottom:6px;flex-wrap:wrap;">` +
+                    `<span><span style="display:inline-block;width:8px;height:8px;background:#c0392b;border-radius:2px;margin-right:3px;"></span>Formula 1</span>` +
+                    `<span><span style="display:inline-block;width:8px;height:8px;background:#2980b9;border-radius:2px;margin-right:3px;"></span>Formula 2</span>` +
+                    `<span><span style="display:inline-block;width:8px;height:8px;background:#8e44ad;border-radius:2px;margin-right:3px;"></span>PH Holiday</span>` +
+                    `<span><span style="display:inline-block;width:8px;height:8px;background:var(--text-accent);border-radius:2px;margin-right:3px;"></span>Today</span>` +
+                    `</div>`;
+
+                let html = legend + `<table style="width:100%;border-collapse:collapse;color:var(--text-main);font-family:monospace;font-size:11px;">
                     <tr>
                         <td style="text-align:left;padding-bottom:6px;">
                             <button onclick="calendarNav(-1)" style="appearance:none;background:transparent;border:1px solid var(--border-color);color:var(--text-accent);font-family:monospace;font-size:10px;cursor:pointer;padding:1px 5px;">&lt;</button>
@@ -2164,19 +2181,32 @@
                     const isToday = isCurrentMonth && day === todayDate;
                     const dateKey = year + "-" + String(month + 1).padStart(2, "0") + "-" + String(day).padStart(2, "0");
                     const events  = calendarEventMap[dateKey] || [];
-                    const hasEvent = events.length > 0;
-                    const title   = hasEvent ? events.join(", ") : "";
+                    const title   = events.length ? events.map(e => e.name).join(", ") : "";
 
-                    let cellStyle = "text-align:center;padding:4px 3px;position:relative;";
+                    // Pick the dominant bg color: today overrides, otherwise first event's color
+                    let bg = "", fg = "inherit", border = "";
                     if (isToday) {
-                        cellStyle += "background:var(--text-accent);color:#0b0f17;border-radius:3px;font-weight:bold;";
+                        bg = "var(--text-accent)";
+                        fg = "#0b0f17";
+                        // If also has events, show a colored left border
+                        if (events.length) border = "border-left:3px solid " + events[0].color + ";";
+                    } else if (events.length) {
+                        // Multiple calendars on same day: blend by showing first color as bg (semi-transparent)
+                        bg = events[0].color;
+                        fg = "#fff";
+                        // Additional calendars shown as right border
+                        if (events.length > 1) border = "border-right:3px solid " + events[events.length - 1].color + ";";
                     }
 
-                    const dot = hasEvent
-                        ? `<span style="display:block;width:4px;height:4px;border-radius:50%;background:${isToday ? "#0b0f17" : "var(--text-accent)"};margin:1px auto 0;"></span>`
-                        : "";
+                    const cellStyle =
+                        "text-align:center;padding:4px 3px;" +
+                        (bg ? "background:" + bg + ";" : "") +
+                        (fg !== "inherit" ? "color:" + fg + ";" : "") +
+                        (isToday ? "font-weight:bold;" : "") +
+                        "border-radius:3px;" +
+                        border;
 
-                    html += `<td style="${cellStyle}"${title ? ` title="${title.replace(/"/g, "&quot;")}"` : ""}>${day}${dot}</td>`;
+                    html += `<td style="${cellStyle}"${title ? ` title="${title.replace(/"/g, "&quot;")}"` : ""}>${day}</td>`;
 
                     if ((day + firstDay) % 7 === 0 && day < daysInMonth) html += "</tr><tr>";
                 }
