@@ -1,6 +1,7 @@
 
 
 
+
 <!doctype html>
 <html lang="en">
     <head>
@@ -635,6 +636,11 @@
                 height: 250px;
             }
 
+            #calendar-popup {
+                width: 380px;
+                height: 320px;
+            }
+
             #relations-popup {
                 width: 330px;
                 height: 260px;
@@ -1032,8 +1038,10 @@
 
                     <div class="terminal-card">
                         <div class="terminal-header">calendar <div class="dots"><span>_</span><span>▢</span><span>×</span></div></div>
-                        <div class="terminal-body">
-                            <a href="javascript:void(0);" onclick="openCalendarPopup()">View Calendar &raquo;</a>
+                        <div class="terminal-body" style="padding:6px;">
+                            <div id="calendar-mini"></div>
+                            <div class="line" style="margin-top:6px;margin-bottom:4px;"></div>
+                            <a href="javascript:void(0);" onclick="openCalendarPopup()">Expand &raquo;</a>
                         </div>
                     </div>
                 </aside>
@@ -2060,32 +2068,57 @@
                 popup.style.transform = "translate(-50%, -50%)";
                 popup.style.display = "block";
                 bringPopupToFront(popup);
-                renderCalendar();
+                renderCalendar("calendar-content", true);
             }
 
             function closeCalendarPopup() {
                 closePopupById("calendar-popup");
             }
 
-            function renderCalendar() {
+            function buildCalendarTable(targetId, large) {
                 const now = new Date();
+                const todayDate = now.getDate();
                 const month = now.getMonth();
                 const year = now.getFullYear();
                 const daysInMonth = new Date(year, month + 1, 0).getDate();
                 const firstDay = new Date(year, month, 1).getDay();
                 const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+                const fontSize = large ? "11px" : "9px";
+                const cellPad = large ? "5px 3px" : "2px 1px";
 
-                let html = `<table style="width:100%; border-collapse:collapse; color:var(--text-main); font-family:monospace; font-size:10px;">
-                    <tr><td colspan="7" style="text-align:center; color:var(--text-heading);"><strong>${monthNames[month]} ${year}</strong></td></tr>
-                    <tr style="color:var(--text-accent);"><td>Su</td><td>M</td><td>Tu</td><td>W</td><td>Th</td><td>F</td><td>Sa</td></tr><tr>`;
-                for (let i = 0; i < firstDay; i++) { html += "<td> </td>"; }
+                let html = `<table style="width:100%;border-collapse:collapse;color:var(--text-main);font-family:monospace;font-size:${fontSize};">
+                    <tr><td colspan="7" style="text-align:center;color:var(--text-heading);padding-bottom:4px;"><strong>${monthNames[month]} ${year}</strong></td></tr>
+                    <tr style="color:var(--text-accent);">
+                        <td style="padding:${cellPad};text-align:center;">Su</td>
+                        <td style="padding:${cellPad};text-align:center;">M</td>
+                        <td style="padding:${cellPad};text-align:center;">Tu</td>
+                        <td style="padding:${cellPad};text-align:center;">W</td>
+                        <td style="padding:${cellPad};text-align:center;">Th</td>
+                        <td style="padding:${cellPad};text-align:center;">F</td>
+                        <td style="padding:${cellPad};text-align:center;">Sa</td>
+                    </tr><tr>`;
+
+                for (let i = 0; i < firstDay; i++) {
+                    html += `<td style="padding:${cellPad};"></td>`;
+                }
                 for (let day = 1; day <= daysInMonth; day++) {
-                    html += `<td style="text-align:center; padding:2px;">${day}</td>`;
-                    if ((day + firstDay) % 7 === 0) html += "</tr><tr>";
+                    const isToday = day === todayDate;
+                    const todayStyle = isToday
+                        ? `background:var(--text-accent);color:#0b0f17;border-radius:3px;font-weight:bold;`
+                        : "";
+                    html += `<td style="text-align:center;padding:${cellPad};${todayStyle}">${day}</td>`;
+                    if ((day + firstDay) % 7 === 0 && day < daysInMonth) html += "</tr><tr>";
                 }
                 html += "</tr></table>";
-                document.getElementById("calendar-content").innerHTML = html;
+                document.getElementById(targetId).innerHTML = html;
             }
+
+            function renderCalendar(targetId, large) {
+                buildCalendarTable(targetId || "calendar-content", !!large);
+            }
+
+            // Render the mini calendar in the sidebar on load
+            renderCalendar("calendar-mini", false);
 
             // Ensure the calendar is draggable
             dragElement(document.getElementById("calendar-popup"));
