@@ -1,7 +1,6 @@
 
 
 
-
 <!doctype html>
 <html lang="en">
     <head>
@@ -636,11 +635,6 @@
                 height: 250px;
             }
 
-            #calendar-popup {
-                width: 380px;
-                height: 320px;
-            }
-
             #relations-popup {
                 width: 330px;
                 height: 260px;
@@ -1038,10 +1032,10 @@
 
                     <div class="terminal-card">
                         <div class="terminal-header">calendar <div class="dots"><span>_</span><span>▢</span><span>×</span></div></div>
-                        <div class="terminal-body" style="padding:6px;">
-                            <div id="calendar-mini"></div>
-                            <div class="line" style="margin-top:6px;margin-bottom:4px;"></div>
-                            <a href="javascript:void(0);" onclick="openCalendarPopup()">Expand &raquo;</a>
+                        <div class="terminal-body">
+                            <span id="calendar-today-display" style="color:var(--text-heading);"></span>
+                            <div class="line" style="margin-top:4px;margin-bottom:4px;"></div>
+                            <a href="javascript:void(0);" onclick="openCalendarPopup()">View Calendar &raquo;</a>
                         </div>
                     </div>
                 </aside>
@@ -1064,7 +1058,7 @@
                             <div class="profile-card">
                                 <img class="profile-icon" src="https://file.garden/ai5LuPrOLRCONCXy/PROFILES/930727293c0bcbb9fcd9f95619d45ba1.jpg" alt="Caelum profile icon">
                                 <blockquote class="profile-copy">
-                                    <b>Name:</b> Caelum Nikolaj Vergara<br>
+                                    <b>Name:</b> Caelum Vergara<br>
                                     <b>Pronouns:</b> He/Him<br>
                                     <b>Location:</b> Manila, PH<br>
                                     Master’s student in Aerospace Engineering. Part-time worker @ a hobby shop. Born May 13. Hyuka FC. Strictly in-character. Minsan nagrereply sa DMs, minsan nde.
@@ -1597,12 +1591,11 @@
                 }
             }
 
-            //sheetdb
             const sheetSources = {
-                caeUpdate: "https://script.google.com/macros/s/AKfycbyVgM0xYYghFVQ-yXbnxssr6FkjL1np_JBjRq6V1VLsusbqzHXccaYpoRxb7Sp13QXmeA/exec",
-                siteUpdate: "https://script.google.com/macros/s/AKfycby0bnGocNsGCRXG_kPrnBV-U8LSZIHBvc8Jtz_jQw8el13M5r39bRsPjKyX1MhxZj_XwQ/exec",
-                relations: "https://script.google.com/macros/s/AKfycbyhXGKyg-zEQO8xQVeerpje78WPaQp87L_I1GXtkGskBQIiSVvFZmS3R2s8lovEVVf6/exec",
-                visualArchive: "https://script.google.com/macros/s/AKfycbwbd5o-dPVLl86fRamK3pzoLFJuuvHTXkfKv7WZyBJR5R91HcEO9vZ6a98_emOIIPdvbg/exec"
+                caeUpdate: "https://sheetdb.io/api/v1/leh6xziit03xx",
+                siteUpdate: "https://sheetdb.io/api/v1/1joq1jhq516th",
+                relations: "https://sheetdb.io/api/v1/s6czdlh0tg0j9",
+                visualArchive: "https://sheetdb.io/api/v1/766ggd6eiv687"
             };
 
             let relationProfiles = [];
@@ -2061,64 +2054,91 @@
 
             loadTrack(track_index, true);
             // ADD THESE FUNCTIONS TO YOUR EXISTING SCRIPT BLOCK
+            let calendarViewMonth = new Date().getMonth();
+            let calendarViewYear = new Date().getFullYear();
+
             function openCalendarPopup() {
+                // Reset to current month each time popup opens
+                calendarViewMonth = new Date().getMonth();
+                calendarViewYear = new Date().getFullYear();
                 const popup = document.getElementById("calendar-popup");
                 popup.style.top = "50%";
                 popup.style.left = "50%";
                 popup.style.transform = "translate(-50%, -50%)";
                 popup.style.display = "block";
                 bringPopupToFront(popup);
-                renderCalendar("calendar-content", true);
+                renderCalendar();
             }
 
             function closeCalendarPopup() {
                 closePopupById("calendar-popup");
             }
 
-            function buildCalendarTable(targetId, large) {
-                const now = new Date();
-                const todayDate = now.getDate();
-                const month = now.getMonth();
-                const year = now.getFullYear();
-                const daysInMonth = new Date(year, month + 1, 0).getDate();
-                const firstDay = new Date(year, month, 1).getDay();
-                const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-                const fontSize = large ? "11px" : "9px";
-                const cellPad = large ? "5px 3px" : "2px 1px";
+            function calendarNav(delta) {
+                calendarViewMonth += delta;
+                if (calendarViewMonth > 11) { calendarViewMonth = 0; calendarViewYear++; }
+                if (calendarViewMonth < 0)  { calendarViewMonth = 11; calendarViewYear--; }
+                renderCalendar();
+            }
 
-                let html = `<table style="width:100%;border-collapse:collapse;color:var(--text-main);font-family:monospace;font-size:${fontSize};">
-                    <tr><td colspan="7" style="text-align:center;color:var(--text-heading);padding-bottom:4px;"><strong>${monthNames[month]} ${year}</strong></td></tr>
+            function renderCalendar() {
+                const today = new Date();
+                const todayDate  = today.getDate();
+                const todayMonth = today.getMonth();
+                const todayYear  = today.getFullYear();
+
+                const month = calendarViewMonth;
+                const year  = calendarViewYear;
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const firstDay    = new Date(year, month, 1).getDay();
+                const monthNames  = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+                const isCurrentMonth = (month === todayMonth && year === todayYear);
+
+                let html = `<table style="width:100%;border-collapse:collapse;color:var(--text-main);font-family:monospace;font-size:11px;">
+                    <tr>
+                        <td style="text-align:left;padding-bottom:6px;">
+                            <button onclick="calendarNav(-1)" style="appearance:none;background:transparent;border:1px solid var(--border-color);color:var(--text-accent);font-family:monospace;font-size:10px;cursor:pointer;padding:1px 5px;">&lt;</button>
+                        </td>
+                        <td colspan="5" style="text-align:center;color:var(--text-heading);padding-bottom:6px;"><strong>${monthNames[month]} ${year}</strong></td>
+                        <td style="text-align:right;padding-bottom:6px;">
+                            <button onclick="calendarNav(1)" style="appearance:none;background:transparent;border:1px solid var(--border-color);color:var(--text-accent);font-family:monospace;font-size:10px;cursor:pointer;padding:1px 5px;">&gt;</button>
+                        </td>
+                    </tr>
                     <tr style="color:var(--text-accent);">
-                        <td style="padding:${cellPad};text-align:center;">Su</td>
-                        <td style="padding:${cellPad};text-align:center;">M</td>
-                        <td style="padding:${cellPad};text-align:center;">Tu</td>
-                        <td style="padding:${cellPad};text-align:center;">W</td>
-                        <td style="padding:${cellPad};text-align:center;">Th</td>
-                        <td style="padding:${cellPad};text-align:center;">F</td>
-                        <td style="padding:${cellPad};text-align:center;">Sa</td>
+                        <td style="padding:4px 3px;text-align:center;">Su</td>
+                        <td style="padding:4px 3px;text-align:center;">M</td>
+                        <td style="padding:4px 3px;text-align:center;">Tu</td>
+                        <td style="padding:4px 3px;text-align:center;">W</td>
+                        <td style="padding:4px 3px;text-align:center;">Th</td>
+                        <td style="padding:4px 3px;text-align:center;">F</td>
+                        <td style="padding:4px 3px;text-align:center;">Sa</td>
                     </tr><tr>`;
 
                 for (let i = 0; i < firstDay; i++) {
-                    html += `<td style="padding:${cellPad};"></td>`;
+                    html += `<td style="padding:4px 3px;"></td>`;
                 }
                 for (let day = 1; day <= daysInMonth; day++) {
-                    const isToday = day === todayDate;
-                    const todayStyle = isToday
+                    const isToday = isCurrentMonth && day === todayDate;
+                    const style = isToday
                         ? `background:var(--text-accent);color:#0b0f17;border-radius:3px;font-weight:bold;`
                         : "";
-                    html += `<td style="text-align:center;padding:${cellPad};${todayStyle}">${day}</td>`;
+                    html += `<td style="text-align:center;padding:4px 3px;${style}">${day}</td>`;
                     if ((day + firstDay) % 7 === 0 && day < daysInMonth) html += "</tr><tr>";
                 }
                 html += "</tr></table>";
-                document.getElementById(targetId).innerHTML = html;
+                document.getElementById("calendar-content").innerHTML = html;
             }
 
-            function renderCalendar(targetId, large) {
-                buildCalendarTable(targetId || "calendar-content", !!large);
-            }
-
-            // Render the mini calendar in the sidebar on load
-            renderCalendar("calendar-mini", false);
+            // Show today's date in the sidebar card
+            (function() {
+                const el = document.getElementById("calendar-today-display");
+                if (!el) return;
+                const now = new Date();
+                const dayNames   = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+                const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+                el.textContent = monthNames[now.getMonth()] + " " + now.getDate() + ", " + now.getFullYear() + " — " + dayNames[now.getDay()];
+            })();
 
             // Ensure the calendar is draggable
             dragElement(document.getElementById("calendar-popup"));
