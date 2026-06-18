@@ -2195,7 +2195,7 @@
                 }
                 html += "</tr></table>";
 
-                // Upcoming events list
+                // Upcoming events list — compact
                 const allEvents = Object.entries(calendarEventMap)
                     .filter(([k]) => k.startsWith(year + "-" + String(month + 1).padStart(2, "0")))
                     .flatMap(([k, evs]) => evs.map(e => ({ date: k, name: e.name, color: e.color })))
@@ -2205,50 +2205,87 @@
                 const upcoming = isCurrentMonth ? allEvents.filter(e => e.date >= today8) : allEvents;
 
                 let upcomingHtml =
-                    `<div style="margin-top:10px;border-top:1px dashed var(--border-color);padding-top:6px;">` +
-                    `<div style="font-family:monospace;font-size:9px;font-weight:bold;text-transform:uppercase;color:var(--text-accent);margin-bottom:5px;letter-spacing:1px;">upcoming events</div>`;
+                    `<div style="margin-top:8px;border-top:1px dashed var(--border-color);padding-top:5px;font-family:monospace;">` +
+                    `<span style="font-size:8px;font-weight:bold;text-transform:uppercase;color:var(--text-accent);letter-spacing:1px;">upcoming</span> `;
 
                 if (!upcoming.length) {
-                    upcomingHtml += `<div style="font-family:monospace;font-size:9px;color:var(--text-main);opacity:0.6;">no events this month</div>`;
+                    upcomingHtml += `<span style="font-size:8px;color:var(--text-main);opacity:0.5;">none this month</span>`;
                 } else {
-                    upcoming.slice(0, 6).forEach(ev => {
+                    const show = upcoming.slice(0, 3);
+                    upcomingHtml += show.map(ev => {
                         const d = new Date(ev.date + "T00:00:00");
-                        const label = monthNames[d.getMonth()] + " " + d.getDate();
-                        upcomingHtml +=
-                            `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">` +
-                            `<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${ev.color};flex-shrink:0;"></span>` +
-                            `<span style="font-family:monospace;font-size:9px;color:var(--text-main);"><span style="color:var(--text-heading);">${label}</span> — ${ev.name}</span>` +
-                            `</div>`;
-                    });
-                    if (upcoming.length > 6) {
-                        upcomingHtml += `<div style="font-family:monospace;font-size:9px;color:var(--text-main);opacity:0.5;">+${upcoming.length - 6} more</div>`;
+                        const label = (d.getMonth() + 1) + "/" + d.getDate();
+                        return `<span style="display:inline-flex;align-items:center;gap:3px;margin-right:8px;font-size:8px;color:var(--text-main);">` +
+                            `<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:${ev.color};flex-shrink:0;"></span>` +
+                            `<span style="color:var(--text-heading);">${label}</span> ${ev.name}</span>`;
+                    }).join("");
+                    if (upcoming.length > 3) {
+                        upcomingHtml += `<span style="font-size:8px;color:var(--text-main);opacity:0.5;">+${upcoming.length - 3} more</span>`;
                     }
                 }
                 upcomingHtml += `</div>`;
 
-                // Tap/click notification area
-                const noteHtml = `<div id="cal-event-note" style="display:none;margin-top:8px;padding:6px 8px;background:var(--bg-main);border:1px solid var(--border-color);border-radius:3px;font-family:monospace;font-size:9px;color:var(--text-main);line-height:1.6;"></div>`;
-
-                document.getElementById("calendar-content").innerHTML = html + upcomingHtml + noteHtml;
+                document.getElementById("calendar-content").innerHTML = html + upcomingHtml;
             }
 
             function handleCalendarCellClick(cell) {
                 const raw   = cell.getAttribute("data-cal-events");
                 const label = cell.getAttribute("data-cal-label");
-                const note  = document.getElementById("cal-event-note");
-                if (!note || !raw) return;
+                if (!raw) return;
+
+                // Remove any existing popover
+                const existing = document.getElementById("cal-cell-popover");
+                if (existing) existing.remove();
+
                 const events = raw.split(";;").map(s => {
                     const idx = s.indexOf("|");
                     return { color: s.slice(0, idx), name: s.slice(idx + 1) };
                 });
-                let inner = `<span style="color:var(--text-heading);font-weight:bold;">${label}</span><br>`;
+
+                // Build popover
+                const pop = document.createElement("div");
+                pop.id = "cal-cell-popover";
+                pop.style.cssText =
+                    "position:fixed;z-index:9999;background:var(--bg-box);border:1px solid var(--border-color);" +
+                    "box-shadow:0 6px 24px rgba(0,0,0,0.7);border-radius:4px;padding:10px 12px;" +
+                    "font-family:monospace;font-size:10px;min-width:160px;max-width:240px;color:var(--text-main);";
+
+                let inner =
+                    `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">` +
+                    `<span style="color:var(--text-heading);font-weight:bold;font-size:11px;">${label}</span>` +
+                    `<span onclick="document.getElementById('cal-cell-popover').remove()" ` +
+                    `style="cursor:pointer;color:var(--text-accent);font-size:13px;line-height:1;margin-left:10px;">&times;</span>` +
+                    `</div>`;
                 events.forEach(ev => {
                     inner +=
-                        `<span style="display:inline-block;width:6px;height:6px;border-radius:50%;` +
-                        `background:${ev.color};margin-right:5px;vertical-align:middle;"></span>${ev.name}<br>`;
+                        `<div style="display:flex;align-items:flex-start;gap:7px;margin-bottom:5px;">` +
+                        `<span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${ev.color};flex-shrink:0;margin-top:2px;"></span>` +
+                        `<span style="line-height:1.4;">${ev.name}</span>` +
+                        `</div>`;
                 });
-                note.innerHTML = inner;
-                note.style.display = "block";
+                pop.innerHTML = inner;
+                document.body.appendChild(pop);
+
+                // Position near the tapped cell
+                const rect = cell.getBoundingClientRect();
+                const pw = 240, ph = 80;
+                let top  = rect.bottom + 6;
+                let left = rect.left;
+                if (left + pw > window.innerWidth - 8)  left = window.innerWidth - pw - 8;
+                if (top  + ph > window.innerHeight - 8) top  = rect.top - ph - 6;
+                pop.style.top  = Math.max(8, top)  + "px";
+                pop.style.left = Math.max(8, left) + "px";
+
+                // Dismiss on outside click/tap
+                setTimeout(() => {
+                    function dismiss(e) {
+                        if (!pop.contains(e.target)) {
+                            pop.remove();
+                            document.removeEventListener("pointerdown", dismiss);
+                        }
+                    }
+                    document.addEventListener("pointerdown", dismiss);
+                }, 0);
             }
 
             // Google Calendar API — fetch next upcoming event across all calendars
