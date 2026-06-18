@@ -1598,10 +1598,10 @@
             }
 
             const sheetSources = {
-                caeUpdate: "https://sheetdb.io/api/v1/leh6xziit03xx",
-                siteUpdate: "https://sheetdb.io/api/v1/1joq1jhq516th",
-                relations: "https://sheetdb.io/api/v1/s6czdlh0tg0j9",
-                visualArchive: "https://sheetdb.io/api/v1/766ggd6eiv687"
+                caeUpdate: "https://script.google.com/macros/s/AKfycbyVgM0xYYghFVQ-yXbnxssr6FkjL1np_JBjRq6V1VLsusbqzHXccaYpoRxb7Sp13QXmeA/exec",
+                siteUpdate: "https://script.google.com/macros/s/AKfycby0bnGocNsGCRXG_kPrnBV-U8LSZIHBvc8Jtz_jQw8el13M5r39bRsPjKyX1MhxZj_XwQ/exec",
+                relations: "https://script.google.com/macros/s/AKfycbyhXGKyg-zEQO8xQVeerpje78WPaQp87L_I1GXtkGskBQIiSVvFZmS3R2s8lovEVVf6/exec",
+                visualArchive: "https://script.google.com/macros/s/AKfycbwbd5o-dPVLl86fRamK3pzoLFJuuvHTXkfKv7WZyBJR5R91HcEO9vZ6a98_emOIIPdvbg/exec"
             };
 
             let relationProfiles = [];
@@ -2136,18 +2136,95 @@
                 document.getElementById("calendar-content").innerHTML = html;
             }
 
-            // Show today's date in the sidebar card
+            // Show today's date in the sidebar card + upcoming event countdown
             (function() {
                 const el = document.getElementById("calendar-today-display");
                 if (!el) return;
                 const now = new Date();
                 const dayNames   = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
                 const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+                // Date line: "June 18, 2026" on top, "Thursday" below
                 el.innerHTML =
-                    "<span style='font-size:15px;font-weight:bold;'>" + monthNames[now.getMonth()] + " " + now.getDate() + "</span>" +
-                    "<br>" +
-                    "<span style='color:var(--text-main);font-size:11px;'>" + now.getFullYear() + " &mdash; " + dayNames[now.getDay()] + "</span>";
+                    "<span style='font-size:15px;font-weight:bold;color:var(--text-heading);'>" +
+                        monthNames[now.getMonth()] + " " + now.getDate() + ", " + now.getFullYear() +
+                    "</span><br>" +
+                    "<span style='font-size:11px;color:var(--text-main);'>" + dayNames[now.getDay()] + "</span>" +
+                    "<div id='calendar-countdown' style='margin-top:6px;font-size:9px;font-family:monospace;color:var(--text-accent);min-height:14px;'>loading events...</div>";
+
+                fetchNextCalendarEvent();
             })();
+
+            // Google Calendar API — fetch next upcoming event across all calendars
+            const gcalApiKey = "AIzaSyArJFBiBtSAh-k_xUByTLmfiZURYu91nrw";
+            const gcalIds = [
+                "1d44b7ff695370a1e5e83f9348537da89b88ef36897c0ec21a7cbaa85c0b905d@group.calendar.google.com",
+                "24515d2ce54ba523308a73a469cb1409ba901640aca5f491956154450e42b491@group.calendar.google.com",
+                "en.philippines#holiday@group.v.calendar.google.com"
+            ];
+
+            function fetchNextCalendarEvent() {
+                const countdownEl = document.getElementById("calendar-countdown");
+                if (!countdownEl) return;
+
+                const now = new Date();
+                const timeMin = encodeURIComponent(now.toISOString());
+                const maxResults = 1;
+
+                const fetches = gcalIds.map(id =>
+                    fetch(
+                        "https://www.googleapis.com/calendar/v3/calendars/" +
+                        encodeURIComponent(id) +
+                        "/events?key=" + gcalApiKey +
+                        "&timeMin=" + timeMin +
+                        "&maxResults=" + maxResults +
+                        "&singleEvents=true&orderBy=startTime"
+                    )
+                    .then(r => r.ok ? r.json() : null)
+                    .then(data => {
+                        if (!data || !data.items || !data.items.length) return null;
+                        const ev = data.items[0];
+                        const start = ev.start.dateTime ? new Date(ev.start.dateTime) : new Date(ev.start.date);
+                        return { name: ev.summary, start };
+                    })
+                    .catch(() => null)
+                );
+
+                Promise.all(fetches).then(results => {
+                    if (!countdownEl) return;
+                    const valid = results
+                        .filter(e => e && e.start > now)
+                        .sort((a, b) => a.start - b.start);
+
+                    if (!valid.length) {
+                        countdownEl.textContent = "no upcoming events";
+                        return;
+                    }
+
+                    const next = valid[0];
+                    function tick() {
+                        const diff = next.start - new Date();
+                        if (diff <= 0) {
+                            countdownEl.textContent = next.name + " — now";
+                            return;
+                        }
+                        const d = Math.floor(diff / 86400000);
+                        const h = Math.floor((diff % 86400000) / 3600000);
+                        const m = Math.floor((diff % 3600000) / 60000);
+                        const s = Math.floor((diff % 60000) / 1000);
+                        const parts = [];
+                        if (d) parts.push(d + "d");
+                        if (h) parts.push(h + "h");
+                        if (m) parts.push(m + "m");
+                        parts.push(String(s).padStart(2,"0") + "s");
+                        countdownEl.innerHTML =
+                            "<span style='color:var(--text-main);'>\u25b6 " + next.name + "</span><br>" +
+                            parts.join(" ");
+                        setTimeout(tick, 1000);
+                    }
+                    tick();
+                });
+            }
 
             // Ensure the calendar is draggable
             dragElement(document.getElementById("calendar-popup"));
