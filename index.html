@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=640, initial-scale=0.5, maximum-scale=2">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>CAELUM</title>
 
         <link rel="icon" type="image/png" href="icon.png">
@@ -886,6 +886,22 @@
 
             @media (max-width: 800px) {
                 .top-deck .readout { display: none; }
+            }
+            @media (max-width: 680px) {
+                body {
+                    padding: 6px;
+                }
+                .shell {
+                    max-width: 100%;
+                }
+                .deck-nav a {
+                    font-size: 9px;
+                    padding: 4px 6px;
+                    margin: 0 1px;
+                }
+                .left-pane {
+                    width: 160px;
+                }
             }
         </style>
     </head>
