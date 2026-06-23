@@ -759,8 +759,6 @@
             }
 
             @media (max-width: 800px) {
-                .workspace { flex-direction: column; }
-                .left-pane, .right-pane { width: 100%; }
                 .top-deck .readout { display: none; }
             }
             @media (max-width: 600px) {
@@ -768,6 +766,9 @@
                     font-size: 9px;
                     padding: 4px 6px;
                     margin: 0 1px;
+                }
+                .left-pane {
+                    width: 150px;
                 }
                 .profile-card { display: block; }
                 .profile-icon {
