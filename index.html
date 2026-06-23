@@ -136,12 +136,12 @@
 
             .deck-nav a {
                 font-family: monospace, sans-serif;
-                font-size: 11px;
+                font-size: 9px;
                 text-transform: uppercase;
                 color: #8cb4e2;
                 text-decoration: none;
-                padding: 5px 10px;
-                margin: 0 2px;
+                padding: 3px 6px;
+                margin: 0 1px;
                 background: var(--bg-box);
                 border: 1px dotted var(--border-color);
             }
@@ -885,11 +885,17 @@
             }
 
             @media (max-width: 800px) {
-                .workspace { flex-direction: column; }
-                .left-pane, .right-pane { width: 100%; }
                 .top-deck .readout { display: none; }
             }
             @media (max-width: 600px) {
+                .deck-nav a {
+                    font-size: 9px;
+                    padding: 4px 6px;
+                    margin: 0 1px;
+                }
+                .left-pane {
+                    width: 150px;
+                }
                 .image-matrix { grid-template-columns: repeat(3, 1fr); }
                 .profile-card { display: block; }
                 .profile-icon {
@@ -1066,7 +1072,7 @@
                                     <b>Location:</b> Manila, PH<br>
                                     Master’s student in Aerospace Engineering. Works part-time as a contract-based Mechanical Design Engineer. Born August 14. Hyuka FC. Strictly in-character. Minsan nagrereply sa DMs, minsan nde.
                                     <div class="line"></div>
-                                    <span style="font-style: italic; display: block; text-align: center;">"Carpe diem. Seize the day, boys."</span>
+                                    <span style="font-style: italic;">"Carpe diem. Seize the day, boys."</span>
                                 </blockquote>
                             </div>
                         </div>
